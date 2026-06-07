@@ -1,14 +1,23 @@
 package hei.school.demo.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
+@Entity
+@Table(name="genre")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class Genre {
+    @Id
   private String id;
+    @Column(nullable = false, unique = true)
   private String name;
   private String description;
+  @OneToMany(mappedBy = "genre")
+    private List<BookGenre> bookGenres;
 }
