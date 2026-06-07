@@ -151,7 +151,6 @@ dependencies {
     testImplementation 'org.junit-pioneer:junit-pioneer:2.2.0'
 
 implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-runtimeOnly 'org.postgresql:postgresql'
 
 
 }
