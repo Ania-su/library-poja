@@ -7,35 +7,34 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="book_copy")
+@Table(name = "book_copy")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class BookCopy {
 
-    @Id
-  private String id;
+  @Id private String id;
 
-    @ManyToOne
-    @JoinColumn(name="book_id", nullable=false)
+  @ManyToOne
+  @JoinColumn(name = "book_id", nullable = false)
   private Book book;
 
-    @ManyToOne
-    @JoinColumn(name="library_id", nullable=false)
+  @ManyToOne
+  @JoinColumn(name = "library_id", nullable = false)
   private Library library;
 
-    @ManyToOne
-    @JoinColumn(name="arrival_id")
-    private Arrival arrival;
+  @ManyToOne
+  @JoinColumn(name = "arrival_id")
+  private Arrival arrival;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable=false)
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private CopyCondition condition;
 
-    @Column(name="purchase_price", nullable=false)
+  @Column(name = "purchase_price", nullable = false)
   private double purchasePrice;
 
-    @Column(name="selling_price")
+  @Column(name = "selling_price")
   private double sellingPrice;
 
   private boolean sold;

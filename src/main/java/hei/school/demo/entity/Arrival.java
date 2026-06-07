@@ -1,30 +1,33 @@
 package hei.school.demo.entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
-
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="arrival")
+@Table(name = "arrival")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class Arrival {
-    @Id
-  private String id;
-    @ManyToOne
-    @JoinColumn(name="library_id", nullable=false)
+  @Id private String id;
+
+  @ManyToOne
+  @JoinColumn(name = "library_id", nullable = false)
   private Library library;
-    @Column(name="arrival_date", nullable=false)
+
+  @Column(name = "arrival_date", nullable = false)
   private LocalDate arrivalDate;
-    @Column(nullable=false)
+
+  @Column(nullable = false)
   private String supplier;
-    @Column(name="invoice_reference")
+
+  @Column(name = "invoice_reference")
   private String invoiceReference;
-    @OneToMany(mappedBy = "arrival")
+
+  @OneToMany(mappedBy = "arrival")
   private List<BookCopy> receivedCopies;
 }

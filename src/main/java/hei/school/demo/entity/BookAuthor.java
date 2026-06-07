@@ -7,21 +7,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="book_author")
+@Table(name = "book_author")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class BookAuthor {
-    @Id
-  private String id;
+  @Id private String id;
 
-    @ManyToOne
-    @JoinColumn(name="book_id", nullable=false)
+  @ManyToOne
+  @JoinColumn(name = "book_id", nullable = false)
   private Book book;
-    @ManyToOne
-    @JoinColumn(name="author_id", nullable=false)
+
+  @ManyToOne
+  @JoinColumn(name = "author_id", nullable = false)
   private Author author;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private Role role;
 }

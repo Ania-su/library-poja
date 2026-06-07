@@ -4,5 +4,5 @@ public enum BookFormat {
   POCKET,
   MEDIUM,
   LARGE,
-    LUXURY
+  LUXURY
 }
