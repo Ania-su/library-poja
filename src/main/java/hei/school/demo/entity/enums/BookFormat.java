@@ -2,7 +2,6 @@ package hei.school.demo.entity.enums;
 
 public enum BookFormat {
   POCKET,
-  MEDIUM,
-  LARGE,
-  LUXURY
+  PAPERBACK,
+  HARDBACK
 }
