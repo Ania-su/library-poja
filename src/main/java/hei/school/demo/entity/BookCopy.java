@@ -1,6 +1,6 @@
 package hei.school.demo.entity;
 
-import hei.school.demo.entity.enums.CopyCondition;
+import hei.school.demo.entity.enums.BookFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,29 +13,27 @@ import lombok.NoArgsConstructor;
 @Data
 public class BookCopy {
 
-  @Id private String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private String id;
 
   @ManyToOne
   @JoinColumn(name = "book_id", nullable = false)
   private Book book;
 
-  @ManyToOne
-  @JoinColumn(name = "library_id", nullable = false)
-  private Library library;
-
-  @ManyToOne
-  @JoinColumn(name = "arrival_id")
-  private Arrival arrival;
-
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private CopyCondition condition;
-
-  @Column(name = "purchase_price", nullable = false)
-  private double purchasePrice;
+  private BookFormat format;
 
   @Column(name = "selling_price")
   private double sellingPrice;
+  //  @ManyToOne
+  //  @JoinColumn(name = "library_id", nullable = false)
+  //  private Library library;
 
-  private boolean sold;
+  //  @ManyToOne
+  //  @JoinColumn(name = "arrival_id")
+  //  private Arrival arrival;
+  //  @Column(name = "purchase_price", nullable = false)
+  //  private double purchasePrice;
+  //  private boolean sold;
 }

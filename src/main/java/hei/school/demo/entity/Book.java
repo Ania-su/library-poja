@@ -1,6 +1,5 @@
 package hei.school.demo.entity;
 
-import hei.school.demo.entity.enums.BookFormat;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -14,13 +13,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class Book {
-  @Id private String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private String id;
 
   @Column(nullable = false)
   private String title;
 
-  @Column(unique = true)
-  private String isbn;
+  //  @Column(unique = true)
+  //  private String isbn;
 
   @Column(name = "publication_date")
   private LocalDate publicationDate;
@@ -31,9 +32,6 @@ public class Book {
 
   @Column(columnDefinition = "TEXT")
   private String description;
-
-  @Enumerated(EnumType.STRING)
-  private BookFormat format;
 
   @OneToMany(mappedBy = "book")
   private List<BookAuthor> bookAuthors;

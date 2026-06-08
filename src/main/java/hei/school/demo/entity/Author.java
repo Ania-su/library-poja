@@ -1,7 +1,6 @@
 package hei.school.demo.entity;
 
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,11 +21,11 @@ public class Author {
   @Column(name = "last_name", nullable = false)
   private String lastName;
 
-  private String nationality;
+  //  private String nationality;
 
   @Column(columnDefinition = "TEXT")
   private String biography;
 
-  @OneToMany(mappedBy = "author")
-  private List<BookAuthor> bookAuthors;
+  //  @OneToMany(mappedBy = "author")
+  //  private List<BookAuthor> bookAuthors;
 }
