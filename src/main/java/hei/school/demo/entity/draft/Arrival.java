@@ -1,5 +1,6 @@
-package hei.school.demo.entity;
+package hei.school.demo.entity.draft;
 
+import hei.school.demo.entity.BookCopy;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;

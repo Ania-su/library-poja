@@ -1,5 +1,6 @@
-package hei.school.demo.entity;
+package hei.school.demo.entity.draft;
 
+import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.PaymentMethod;
 import hei.school.demo.entity.enums.SaleStatus;
 import jakarta.persistence.*;

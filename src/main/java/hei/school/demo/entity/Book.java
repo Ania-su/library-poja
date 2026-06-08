@@ -1,5 +1,6 @@
 package hei.school.demo.entity;
 
+import hei.school.demo.entity.draft.Publisher;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -34,10 +35,10 @@ public class Book {
   private String description;
 
   @OneToMany(mappedBy = "book")
-  private List<BookAuthor> bookAuthors;
+  private List<Author> bookAuthors;
 
   @OneToMany(mappedBy = "book")
-  private List<BookGenre> genres;
+  private List<Genre> genres;
 
   @OneToMany(mappedBy = "book")
   private List<BookCopy> copies;

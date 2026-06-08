@@ -1,5 +1,7 @@
-package hei.school.demo.entity;
+package hei.school.demo.entity.draft;
 
+import hei.school.demo.entity.Author;
+import hei.school.demo.entity.Book;
 import hei.school.demo.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

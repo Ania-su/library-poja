@@ -1,4 +1,4 @@
-package hei.school.demo.entity;
+package hei.school.demo.entity.draft;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
