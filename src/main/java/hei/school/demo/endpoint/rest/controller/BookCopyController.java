@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,5 +56,12 @@ public class BookCopyController {
     } catch (Exception e) {
       return ResponseEntity.status(500).body("Crashing in controller: " + e.getMessage());
     }
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getBookCopyById(@PathVariable String id) {
+    BookCopy bookCopy = copyService.getCopyById(id);
+
+    return ResponseEntity.ok(bookCopy);
   }
 }

@@ -50,4 +50,9 @@ public class BookCopyService {
 
     return bookCopyRepository.save(bookCp);
   }
+
+  public BookCopy getCopyById(String id) {
+    return bookCopyRepository.findById(id)
+      .orElseThrow(()-> new RuntimeException("Book copy not found"));
+  }
 }
