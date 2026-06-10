@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -14,12 +15,17 @@ import hei.school.demo.endpoint.rest.controller.dto.BookRequest;
 import hei.school.demo.entity.Book;
 import hei.school.demo.repository.BookRepository;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
 public class BookServiceTest {
@@ -30,6 +36,72 @@ public class BookServiceTest {
   @Mock private BookRepository bookRepository;
 
   @InjectMocks private BookService bookService;
+
+  private Book book1;
+  private Book book2;
+
+  @BeforeEach
+  void setUp() {
+    book1 =
+        new Book(
+            "book-uuid-001",
+            "Méthode Boscher",
+            LocalDate.of(2008, 8, 1),
+            "Livre éducatif pour apprendre le français",
+            null,
+            null,
+            null);
+    book2 =
+        new Book(
+            "book-uuid-002",
+            "Atomic Habits",
+            LocalDate.of(2012, 10, 20),
+            "Change your life with consistency",
+            null,
+            null,
+            null);
+  }
+
+  @Test
+  void getBooks_shouldReturnAllBooks_whenNoFilterProvided() {
+    when(bookRepository.findAll(any(Specification.class), eq(PageRequest.of(0, 10))))
+        .thenReturn(new PageImpl<>(List.of(book1, book2)));
+
+    List<Book> result = bookService.getBooks(null, null, null, null, null, null, 1, 10);
+
+    assertEquals(2, result.size());
+    verify(bookRepository).findAll(any(Specification.class), eq(PageRequest.of(0, 10)));
+  }
+
+  @Test
+  void getBooks_shouldReturnEmptyList_whenNoBooksMatchFilter() {
+    when(bookRepository.findAll(any(Specification.class), eq(PageRequest.of(0, 10))))
+        .thenReturn(new PageImpl<>(List.of()));
+
+    List<Book> result = bookService.getBooks("Inexistant", null, null, null, null, null, 1, 10);
+
+    assertTrue(result.isEmpty());
+  }
+
+  @Test
+  void getBooks_shouldRespectPagination_whenPageAndPerPageProvided() {
+    when(bookRepository.findAll(any(Specification.class), eq(PageRequest.of(1, 5))))
+        .thenReturn(new PageImpl<>(List.of(book2)));
+
+    List<Book> result = bookService.getBooks(null, null, null, null, null, null, 2, 5);
+
+    assertEquals(1, result.size());
+    verify(bookRepository).findAll(any(Specification.class), eq(PageRequest.of(1, 5)));
+  }
+
+  @Test
+  void countBooks_shouldReturnTotalCount_whenNoFilterProvided() {
+    when(bookRepository.count(any(Specification.class))).thenReturn(2L);
+
+    long count = bookService.countBooks(null, null, null, null, null, null);
+
+    assertEquals(2L, count);
+  }
 
   @Test
   void testCreateBook() {
