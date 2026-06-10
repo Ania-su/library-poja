@@ -27,4 +27,13 @@ public class BookCopyService {
     }
     return bookCopyRepository.save(existing);
   }
+
+  public BookCopy deleteBookCopy(String id) {
+    BookCopy bookCopy =
+        bookCopyRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("BookCopy not found with id : " + id));
+    bookCopyRepository.delete(bookCopy);
+    return bookCopy;
+  }
 }
