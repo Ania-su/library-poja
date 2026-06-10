@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class Author {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
   @Column(name = "first_name", nullable = false)
@@ -21,11 +21,6 @@ public class Author {
   @Column(name = "last_name", nullable = false)
   private String lastName;
 
-  //  private String nationality;
-
   @Column(columnDefinition = "TEXT")
   private String biography;
-
-  //  @OneToMany(mappedBy = "author")
-  //  private List<BookAuthor> bookAuthors;
 }

@@ -12,14 +12,11 @@ import lombok.NoArgsConstructor;
 @Data
 public class Genre {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
   @Column(nullable = false, unique = true)
   private String name;
 
   private String description;
-
-  //  @OneToMany(mappedBy = "genre")
-  //  private List<BookGenre> bookGenres;
 }
