@@ -101,4 +101,12 @@ public class BookService {
   public Book getBookById(String id) {
     return bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
   }
+
+  public Book updateBook(String id, Book book) {
+    bookRepository
+        .findById(id)
+        .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+    book.setId(id);
+    return bookRepository.save(book);
+  }
 }
