@@ -1,5 +1,7 @@
 package hei.school.demo.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,4 +25,7 @@ public class Author {
 
   @Column(columnDefinition = "TEXT")
   private String biography;
+
+  @ManyToMany(mappedBy = "authors")
+  private List<Book> books;
 }
