@@ -26,34 +26,34 @@ public class BookService {
       String title,
       String description,
       LocalDate before,
-      String authorId,
-      String genreId,
+      List<String> authorIds,
+      List<String> genreIds,
       LocalDate after,
       int page,
       int perPage) {
 
     Pageable pageable = PageRequest.of(page - 1, perPage);
     return bookRepository
-        .findAll(buildSpec(title, description, authorId, genreId, before, after), pageable)
+        .findAll(buildSpec(title, description, authorIds, genreIds, before, after), pageable)
         .getContent();
   }
 
   public long countBooks(
       String title,
       String description,
-      String authorId,
-      String genreId,
+      List<String> authorIds,
+      List<String> genreIds,
       LocalDate before,
       LocalDate after) {
 
-    return bookRepository.count(buildSpec(title, description, authorId, genreId, before, after));
+    return bookRepository.count(buildSpec(title, description, authorIds, genreIds, before, after));
   }
 
   private Specification<Book> buildSpec(
       String title,
       String description,
-      String authorId,
-      String genreId,
+      List<String> authorIds,
+      List<String> genreIds,
       LocalDate before,
       LocalDate after) {
 
@@ -69,22 +69,22 @@ public class BookService {
             cb.like(cb.lower(root.get("description")), "%" + description.toLowerCase() + "%"));
       }
 
-      if (authorId != null && !authorId.isEmpty()) {
+      if (authorIds != null && !authorIds.isEmpty()) {
         Join<Book, Author> authorJoin = root.join("authors");
-        predicates.add(cb.equal(authorJoin.get("id"), authorId));
+        predicates.add(authorJoin.get("id").in(authorIds));
       }
 
-      if (genreId != null && !genreId.isEmpty()) {
+      if (genreIds != null && !genreIds.isEmpty()) {
         Join<Book, Genre> genreJoin = root.join("genres");
-        predicates.add(cb.equal(genreJoin.get("id"), genreId));
+        predicates.add(genreJoin.get("id").in(genreIds));
       }
 
       if (before != null) {
-        predicates.add(cb.lessThan(root.get("publicationDate"), before));
+        predicates.add(cb.lessThanOrEqualTo(root.get("publicationDate"), before));
       }
 
       if (after != null) {
-        predicates.add(cb.greaterThan(root.get("publicationDate"), after));
+        predicates.add(cb.greaterThanOrEqualTo(root.get("publicationDate"), after));
       }
 
       if (!predicates.isEmpty()) {
