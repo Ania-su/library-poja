@@ -10,6 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.HttpStatus;
+
 
 @RestController
 @AllArgsConstructor
@@ -40,4 +44,14 @@ public class BookController {
       return ResponseEntity.internalServerError().body(e.getMessage());
     }
   }
+
+  @PostMapping("/books")
+  public ResponseEntity<?> createBook(@RequestBody Book book) {
+  try {
+    Book created = bookService.createBook(book);
+    return ResponseEntity.status(HttpStatus.CREATED).body(created);
+  } catch (Exception e) {
+    return ResponseEntity.internalServerError().body(e.getMessage());
+  }
+}
 }

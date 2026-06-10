@@ -77,4 +77,8 @@ public class BookService {
       return cb.and(predicates.toArray(new Predicate[0]));
     };
   }
+
+public Book createBook(Book book) {
+  return bookRepository.save(book);
+}
 }
