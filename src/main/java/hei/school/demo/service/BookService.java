@@ -97,4 +97,8 @@ public class BookService {
   public Book createBook(Book book) {
     return bookRepository.save(book);
   }
+
+  public Book getBookById(String id) {
+    return bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+  }
 }
