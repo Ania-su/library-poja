@@ -17,7 +17,7 @@ public class BookCopyController {
   private final BookCopyRepository bookCopyRepository;
   private final BookCopyService bookCopyService;
 
-  @PatchMapping("/book_copy/{id}")
+  @PatchMapping("/book-copies/{id}")
   public ResponseEntity<?> updateBookCopy(
       @PathVariable String id, @RequestBody BookCopyUpdate bookCopy) {
     BookCopy copy = bookCopyService.updateBookCopy(id, bookCopy);

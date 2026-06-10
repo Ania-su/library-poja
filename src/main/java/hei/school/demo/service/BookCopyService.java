@@ -16,13 +16,13 @@ public class BookCopyService {
   public BookCopy updateBookCopy(String id, BookCopyUpdate bookCopy) {
     BookCopy existing =
         bookCopyRepository
-            .findById(Long.valueOf(id))
+            .findById(id)
             .orElseThrow(() -> new NotFoundException("BookCopy not found with id : " + id));
 
     if (bookCopy.getFormat() != null) {
       existing.setFormat(bookCopy.getFormat());
     }
-    if (bookCopy.getSellingPrice() > 0) {
+    if (bookCopy.getSellingPrice() != null) {
       existing.setSellingPrice(bookCopy.getSellingPrice());
     }
     return bookCopyRepository.save(existing);
