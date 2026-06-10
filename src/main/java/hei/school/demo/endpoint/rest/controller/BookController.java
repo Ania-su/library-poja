@@ -21,14 +21,16 @@ public class BookController {
   public ResponseEntity<?> getBooks(
       @RequestParam(name = "title", required = false) String title,
       @RequestParam(name = "description", required = false) String description,
+      @RequestParam(name = "authorId", required = false) String authorId,
+      @RequestParam(name = "genreId", required = false) String genreId,
       @RequestParam(name = "before", required = false) LocalDate before,
       @RequestParam(name = "after", required = false) LocalDate after,
       @RequestParam(name = "page", defaultValue = "1") int page,
       @RequestParam(name = "perPage", defaultValue = "10") int perPage) {
 
     try {
-      List<Book> books = bookService.getBooks(title, description, before, after, page, perPage);
-      long total = bookService.countBooks(title, description, before, after);
+      List<Book> books = bookService.getBooks(title, description, before, authorId, genreId, after, page, perPage);
+      long total = bookService.countBooks(title, description, authorId, genreId, before, after);
 
       BooksResponse response =
           new BooksResponse(books, new BooksResponse.Meta(total, page, perPage));
