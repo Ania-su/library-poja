@@ -1,18 +1,21 @@
 package hei.school.demo.entity;
 
-import java.math.BigDecimal;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import hei.school.demo.entity.enums.BookFormat;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "book_copy")
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Data
 public class BookCopy {
 

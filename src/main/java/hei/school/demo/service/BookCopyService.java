@@ -18,24 +18,30 @@ import org.springframework.stereotype.Service;
 public class BookCopyService {
 
   private final BookCopyRepository bookCopyRepository;
+  private final BookRepository bookRepository;
 
   public List<BookCopy> findAll(
       UUID bookId, BookFormat format, BigDecimal minPrice, BigDecimal maxPrice) {
-    Specification<BookCopy> spec = Specification.where(BookCopySpecifications.hasBookId(bookId))
-        .and(BookCopySpecifications.hasFormat(format))
-        .and(BookCopySpecifications.priceGreaterThanOrEqualTo(minPrice))
-        .and(BookCopySpecifications.priceLessThanOrEqualTo(maxPrice));
+    Specification<BookCopy> spec =
+        Specification.where(BookCopySpecifications.hasBookId(bookId))
+            .and(BookCopySpecifications.hasFormat(format))
+            .and(BookCopySpecifications.priceGreaterThanOrEqualTo(minPrice))
+            .and(BookCopySpecifications.priceLessThanOrEqualTo(maxPrice));
 
     return bookCopyRepository.findAll(spec);
   }
 
   public BookCopy save(BookCopy bookCopy) {
-    if (bookCopy.getSellingPrice() != null && bookCopy.getSellingPrice().compareTo(BigDecimal.ZERO) < 0) {
+    if (bookCopy.getSellingPrice() != null
+        && bookCopy.getSellingPrice().compareTo(BigDecimal.ZERO) < 0) {
       throw new IllegalArgumentException("Selling price cannot be negative.");
     }
 
-    Book parentBook = BookRepository.findById(bookCopy.getId())
-        .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookCopy.getId()));
+    Book parentBook =
+        bookRepository
+            .findById(bookCopy.getId())
+            .orElseThrow(
+                () -> new IllegalArgumentException("Book not found with ID: " + bookCopy.getId()));
 
     BookCopy bookCp = new BookCopy();
     bookCp.setBook(parentBook);

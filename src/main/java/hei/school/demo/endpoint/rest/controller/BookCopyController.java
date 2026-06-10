@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,14 +33,27 @@ public class BookCopyController {
   }
 
   @PostMapping
-  public ResponseEntity<BookCopy> createBookCopy(@RequestBody BookCopyCreationDto book) {
-    BookCopy bookCopy = new BookCopy();
+  public ResponseEntity<?> createBookCopy(@RequestBody BookCopyCreationDto book) {
+    try {
+      BookCopy bookCopy = new BookCopy();
+      bookCopy.setId(book.bookId());
 
-    bookCopy.setFormat(book.format());
-    bookCopy.setSellingPrice(book.sellingPrice());
+      if (book.format() != null) {
+        try {
+          bookCopy.setFormat(BookFormat.valueOf(book.format().toUpperCase()));
+        } catch (IllegalArgumentException e) {
+          return ResponseEntity.status(400).body("Invalid enum format value.");
+        }
+      }
 
-    BookCopy createdCopy = copyService.save(bookCopy);
+      bookCopy.setSellingPrice(book.sellingPrice());
 
-    return new ResponseEntity<>(createdCopy, HttpStatus.CREATED);
+      BookCopy createdCopy = copyService.save(bookCopy);
+
+      return new ResponseEntity<>(createdCopy, HttpStatus.CREATED);
+
+    } catch (Exception e) {
+      return ResponseEntity.status(500).body("Crashing in controller: " + e.getMessage());
+    }
   }
 }
