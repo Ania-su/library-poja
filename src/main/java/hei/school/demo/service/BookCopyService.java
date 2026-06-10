@@ -1,8 +1,10 @@
 package hei.school.demo.service;
 
+import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.entity.Book;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
+import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.BookRepository;
 import hei.school.demo.repository.specification.BookCopySpecifications;
@@ -49,5 +51,29 @@ public class BookCopyService {
     bookCp.setSellingPrice(bookCopy.getSellingPrice());
 
     return bookCopyRepository.save(bookCp);
+  }
+
+  public BookCopy updateBookCopy(String id, BookCopyUpdate bookCopy) {
+    BookCopy existing =
+        bookCopyRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("BookCopy not found with id : " + id));
+
+    if (bookCopy.getFormat() != null) {
+      existing.setFormat(bookCopy.getFormat());
+    }
+    if (bookCopy.getSellingPrice() != null) {
+      existing.setSellingPrice(BigDecimal.valueOf(bookCopy.getSellingPrice()));
+    }
+    return bookCopyRepository.save(existing);
+  }
+
+  public BookCopy deleteBookCopy(String id) {
+    BookCopy bookCopy =
+        bookCopyRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("BookCopy not found with id : " + id));
+    bookCopyRepository.delete(bookCopy);
+    return bookCopy;
   }
 }

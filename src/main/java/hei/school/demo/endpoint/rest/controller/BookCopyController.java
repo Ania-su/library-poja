@@ -1,6 +1,7 @@
 package hei.school.demo.endpoint.rest.controller;
 
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
+import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.service.BookCopyService;
@@ -10,12 +11,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/book-copies")
@@ -55,5 +51,18 @@ public class BookCopyController {
     } catch (Exception e) {
       return ResponseEntity.status(500).body("Crashing in controller: " + e.getMessage());
     }
+  }
+
+  @PatchMapping("/book-copies/{id}")
+  public ResponseEntity<?> updateBookCopy(
+      @PathVariable String id, @RequestBody BookCopyUpdate bookCopy) {
+    BookCopy copy = copyService.updateBookCopy(id, bookCopy);
+    return ResponseEntity.ok(copy);
+  }
+
+  @DeleteMapping("/book-copies/{id}")
+  public ResponseEntity<?> deleteBookCopy(@PathVariable String id) {
+    BookCopy bookCopy = copyService.deleteBookCopy(id);
+    return ResponseEntity.ok(bookCopy);
   }
 }

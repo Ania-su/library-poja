@@ -9,6 +9,7 @@ plugins {
     id 'org.openapi.generator' version '7.7.0'
 
     id 'jacoco'
+
     
 }
 
@@ -150,6 +151,5 @@ dependencies {
     testImplementation 'org.junit-pioneer:junit-pioneer:2.2.0'
 
 
-    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 
 }
