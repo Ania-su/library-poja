@@ -109,4 +109,13 @@ public class BookService {
     book.setId(id);
     return bookRepository.save(book);
   }
+
+  public Book deleteBook(String id) {
+    Book book =
+        bookRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+    bookRepository.deleteById(id);
+    return book;
+  }
 }
