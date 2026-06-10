@@ -37,17 +37,15 @@ public class Book {
 
   @ManyToMany
   @JoinTable(
-    name = "book_genre",
-    joinColumns = @JoinColumn(name = "book_id"),
-    inverseJoinColumns = @JoinColumn(name="genre_id")
-  )
+      name = "book_genre",
+      joinColumns = @JoinColumn(name = "book_id"),
+      inverseJoinColumns = @JoinColumn(name = "genre_id"))
   private List<Genre> genres;
 
   @ManyToMany
   @JoinTable(
-    name = "book_author",
-    joinColumns = @JoinColumn(name ="book_id"),
-    inverseJoinColumns = @JoinColumn(name = "author_id")
-  )
+      name = "book_author",
+      joinColumns = @JoinColumn(name = "book_id"),
+      inverseJoinColumns = @JoinColumn(name = "author_id"))
   private List<Author> authors;
 }

@@ -5,8 +5,4 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record BookCopyDto(
-    UUID page,
-    BooksResponse book,
-    BookFormat bookFormat,
-    BigDecimal sellingPrice) {
-}
+    UUID page, BooksResponse book, BookFormat bookFormat, BigDecimal sellingPrice) {}

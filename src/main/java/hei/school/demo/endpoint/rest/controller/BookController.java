@@ -29,7 +29,8 @@ public class BookController {
       @RequestParam(name = "perPage", defaultValue = "10") int perPage) {
 
     try {
-      List<Book> books = bookService.getBooks(title, description, before, authorId, genreId, after, page, perPage);
+      List<Book> books =
+          bookService.getBooks(title, description, before, authorId, genreId, after, page, perPage);
       long total = bookService.countBooks(title, description, authorId, genreId, before, after);
 
       BooksResponse response =
