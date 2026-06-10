@@ -1,5 +1,6 @@
 package hei.school.demo.service;
 
+import hei.school.demo.endpoint.rest.controller.dto.BookRequest;
 import hei.school.demo.entity.Author;
 import hei.school.demo.entity.Book;
 import hei.school.demo.entity.Genre;
@@ -94,19 +95,36 @@ public class BookService {
     };
   }
 
-  public Book createBook(Book book) {
-    return bookRepository.save(book);
+  public Book createBook(BookRequest book) {
+    Book toSave = new Book();
+    toSave.setTitle(book.getTitle());
+    toSave.setDescription(book.getDescription());
+    toSave.setPublicationDate(book.getPublicationDate());
+    if (book.getAuthors() != null) {
+      // toSave.setAuthors(authorRepository.findAllById(book.getAuthors()));
+    }
+    if (book.getGenres() != null) {
+      // toSave.setGenres(genreRepository.findAllById(book.getGenres()));
+    }
+    return bookRepository.save(toSave);
   }
 
   public Book getBookById(String id) {
     return bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
   }
 
-  public Book updateBook(String id, Book book) {
-    bookRepository
-        .findById(id)
-        .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
-    book.setId(id);
-    return bookRepository.save(book);
+  public Book updateBook(String id, BookRequest book) {
+    Book existing =
+        bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+    existing.setTitle(book.getTitle());
+    existing.setDescription(book.getDescription());
+    existing.setPublicationDate(book.getPublicationDate());
+    if (book.getAuthors() != null) {
+      // existing.setAuthors(authorRepository.findAllById(book.getAuthors()));
+    }
+    if (book.getGenres() != null) {
+      // existing.setGenres(genreRepository.findAllById(book.getGenres()));
+    }
+    return bookRepository.save(existing);
   }
 }

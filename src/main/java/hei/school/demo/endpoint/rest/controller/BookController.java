@@ -1,5 +1,6 @@
 package hei.school.demo.endpoint.rest.controller;
 
+import hei.school.demo.endpoint.rest.controller.dto.BookRequest;
 import hei.school.demo.endpoint.rest.controller.dto.BooksResponse;
 import hei.school.demo.entity.Book;
 import hei.school.demo.service.BookService;
@@ -48,7 +49,7 @@ public class BookController {
   }
 
   @PostMapping("/books")
-  public ResponseEntity<?> createBook(@RequestBody Book book) {
+  public ResponseEntity<?> createBook(@RequestBody BookRequest book) {
     try {
       Book created = bookService.createBook(book);
       return ResponseEntity.status(HttpStatus.CREATED).body(created);
@@ -68,7 +69,7 @@ public class BookController {
   }
 
   @PutMapping("/books/{id}")
-  public ResponseEntity<?> updateBook(@PathVariable String id, @RequestBody Book book) {
+  public ResponseEntity<?> updateBook(@PathVariable String id, @RequestBody BookRequest book) {
     try {
       Book updated = bookService.updateBook(id, book);
       return ResponseEntity.ok(updated);
