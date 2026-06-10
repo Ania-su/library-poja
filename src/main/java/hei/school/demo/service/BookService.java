@@ -22,9 +22,14 @@ public class BookService {
   private final BookRepository bookRepository;
 
   public List<Book> getBooks(
-      String title, String description, LocalDate before,
-      String authorId, String genreId,
-       LocalDate after, int page, int perPage) {
+      String title,
+      String description,
+      LocalDate before,
+      String authorId,
+      String genreId,
+      LocalDate after,
+      int page,
+      int perPage) {
 
     Pageable pageable = PageRequest.of(page - 1, perPage);
     return bookRepository
@@ -32,13 +37,24 @@ public class BookService {
         .getContent();
   }
 
-  public long countBooks(String title, String description, String authorId, String genreId, LocalDate before, LocalDate after) {
+  public long countBooks(
+      String title,
+      String description,
+      String authorId,
+      String genreId,
+      LocalDate before,
+      LocalDate after) {
 
     return bookRepository.count(buildSpec(title, description, authorId, genreId, before, after));
   }
 
   private Specification<Book> buildSpec(
-      String title, String description, String authorId, String genreId, LocalDate before, LocalDate after) {
+      String title,
+      String description,
+      String authorId,
+      String genreId,
+      LocalDate before,
+      LocalDate after) {
 
     return (root, query, cb) -> {
       ArrayList<Predicate> predicates = new ArrayList<Predicate>();
@@ -78,7 +94,7 @@ public class BookService {
     };
   }
 
-public Book createBook(Book book) {
-  return bookRepository.save(book);
-}
+  public Book createBook(Book book) {
+    return bookRepository.save(book);
+  }
 }
