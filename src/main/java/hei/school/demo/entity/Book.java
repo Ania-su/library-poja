@@ -1,11 +1,14 @@
 package hei.school.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "book")
@@ -27,6 +30,9 @@ public class Book {
   private String description;
 
   @OneToMany(mappedBy = "book")
+  @JsonIgnore
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<BookCopy> copies;
 
   @ManyToMany

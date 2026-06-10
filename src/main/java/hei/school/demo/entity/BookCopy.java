@@ -1,5 +1,6 @@
 package hei.school.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import hei.school.demo.entity.enums.BookFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ public class BookCopy {
 
   @ManyToOne
   @JoinColumn(name = "book_id", nullable = false)
+  @JsonIgnore
   private Book book;
 
   @Enumerated(EnumType.STRING)
