@@ -28,57 +28,36 @@ public class BookController {
       @RequestParam(name = "page", defaultValue = "1") int page,
       @RequestParam(name = "perPage", defaultValue = "10") int perPage) {
 
-    try {
-      List<Book> books =
-          bookService.getBooks(title, description, before, authorId, genreId, after, page, perPage);
-      long total = bookService.countBooks(title, description, authorId, genreId, before, after);
+    List<Book> books =
+        bookService.getBooks(title, description, before, authorId, genreId, after, page, perPage);
+    long total = bookService.countBooks(title, description, authorId, genreId, before, after);
 
-      BooksResponse response =
-          new BooksResponse(books, new BooksResponse.Meta(total, page, perPage));
+    BooksResponse response = new BooksResponse(books, new BooksResponse.Meta(total, page, perPage));
 
-      return ResponseEntity.ok(response);
-    } catch (Exception e) {
-      return ResponseEntity.internalServerError().body(e.getMessage());
-    }
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/books")
   public ResponseEntity<?> createBook(@RequestBody BookRequest book) {
-    try {
-      Book created = bookService.createBook(book);
-      return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    } catch (Exception e) {
-      return ResponseEntity.internalServerError().body(e.getMessage());
-    }
+    Book created = bookService.createBook(book);
+    return ResponseEntity.status(HttpStatus.CREATED).body(created);
   }
 
   @GetMapping("/books/{id}")
   public ResponseEntity<?> getBookById(@PathVariable String id) {
-    try {
-      Book book = bookService.getBookById(id);
-      return ResponseEntity.ok(book);
-    } catch (Exception e) {
-      return ResponseEntity.internalServerError().body(e.getMessage());
-    }
+    Book book = bookService.getBookById(id);
+    return ResponseEntity.ok(book);
   }
 
   @PutMapping("/books/{id}")
   public ResponseEntity<?> updateBook(@PathVariable String id, @RequestBody BookRequest book) {
-    try {
-      Book updated = bookService.updateBook(id, book);
-      return ResponseEntity.ok(updated);
-    } catch (Exception e) {
-      return ResponseEntity.internalServerError().body(e.getMessage());
-    }
+    Book updated = bookService.updateBook(id, book);
+    return ResponseEntity.ok(updated);
   }
 
   @DeleteMapping("/book/{id}")
   public ResponseEntity<?> deleteBook(@PathVariable String id) {
-    try {
-      bookService.deleteBook(id);
-      return ResponseEntity.noContent().build();
-    } catch (Exception e) {
-      return ResponseEntity.internalServerError().body(e.getMessage());
-    }
+    bookService.deleteBook(id);
+    return ResponseEntity.noContent().build();
   }
 }
