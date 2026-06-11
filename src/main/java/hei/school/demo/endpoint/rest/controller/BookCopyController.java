@@ -53,6 +53,13 @@ public class BookCopyController {
     }
   }
 
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getBookCopyById(@PathVariable String id) {
+    BookCopy bookCopy = copyService.getCopyById(id);
+
+    return ResponseEntity.ok(bookCopy);
+  }
+
   @PatchMapping("/book-copies/{id}")
   public ResponseEntity<?> updateBookCopy(
       @PathVariable String id, @RequestBody BookCopyUpdate bookCopy) {
