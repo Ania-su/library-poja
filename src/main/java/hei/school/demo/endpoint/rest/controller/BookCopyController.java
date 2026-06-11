@@ -5,7 +5,7 @@ import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.service.BookCopyService;
-import java.math.BigDecimal;
+
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +23,8 @@ public class BookCopyController {
   public ResponseEntity<List<BookCopy>> getAllBookCopies(
       @RequestParam(required = false) UUID bookId,
       @RequestParam(required = false) BookFormat format,
-      @RequestParam(required = false) BigDecimal minPrice,
-      @RequestParam(required = false) BigDecimal maxPrice) {
+      @RequestParam(required = false) double minPrice,
+      @RequestParam(required = false) double maxPrice) {
     return ResponseEntity.ok(copyService.findAll(bookId, format, minPrice, maxPrice));
   }
 
@@ -42,7 +42,7 @@ public class BookCopyController {
         }
       }
 
-      bookCopy.setSellingPrice(book.sellingPrice());
+      bookCopy.setSellingPrice(book.sellingPrice().doubleValue());
 
       BookCopy createdCopy = copyService.save(bookCopy);
 

@@ -2,7 +2,7 @@ package hei.school.demo.repository.specification;
 
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
-import java.math.BigDecimal;
+
 import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -16,12 +16,12 @@ public class BookCopySpecifications {
     return (root, query, cb) -> format == null ? null : cb.equal(root.get("format"), format);
   }
 
-  public static Specification<BookCopy> priceGreaterThanOrEqualTo(BigDecimal minPrice) {
+  public static Specification<BookCopy> priceGreaterThanOrEqualTo(Double minPrice) {
     return (root, query, cb) ->
         minPrice == null ? null : cb.greaterThanOrEqualTo(root.get("sellingPrice"), minPrice);
   }
 
-  public static Specification<BookCopy> priceLessThanOrEqualTo(BigDecimal maxPrice) {
+  public static Specification<BookCopy> priceLessThanOrEqualTo(Double maxPrice) {
     return (root, query, cb) ->
         maxPrice == null ? null : cb.lessThanOrEqualTo(root.get("sellingPrice"), maxPrice);
   }

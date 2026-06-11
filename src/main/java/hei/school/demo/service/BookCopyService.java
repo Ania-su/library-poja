@@ -8,7 +8,7 @@ import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.BookRepository;
 import hei.school.demo.repository.specification.BookCopySpecifications;
-import java.math.BigDecimal;
+
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -23,7 +23,7 @@ public class BookCopyService {
   private final BookRepository bookRepository;
 
   public List<BookCopy> findAll(
-      UUID bookId, BookFormat format, BigDecimal minPrice, BigDecimal maxPrice) {
+      UUID bookId, BookFormat format, double minPrice, double maxPrice) {
     Specification<BookCopy> spec =
         Specification.where(BookCopySpecifications.hasBookId(bookId))
             .and(BookCopySpecifications.hasFormat(format))
@@ -34,8 +34,7 @@ public class BookCopyService {
   }
 
   public BookCopy save(BookCopy bookCopy) {
-    if (bookCopy.getSellingPrice() != null
-        && bookCopy.getSellingPrice().compareTo(BigDecimal.ZERO) < 0) {
+    if (bookCopy.getSellingPrice() < 0) {
       throw new IllegalArgumentException("Selling price cannot be negative.");
     }
 
@@ -69,7 +68,7 @@ public class BookCopyService {
       existing.setFormat(bookCopy.getFormat());
     }
     if (bookCopy.getSellingPrice() != null) {
-      existing.setSellingPrice(BigDecimal.valueOf(bookCopy.getSellingPrice()));
+      existing.setSellingPrice(bookCopy.getSellingPrice());
     }
     return bookCopyRepository.save(existing);
   }

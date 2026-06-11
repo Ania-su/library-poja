@@ -2,7 +2,7 @@ package hei.school.demo.entity;
 
 import hei.school.demo.entity.enums.BookFormat;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -30,7 +30,7 @@ public class BookCopy {
   private BookFormat format;
 
   @Column(name = "selling_price")
-  private BigDecimal sellingPrice;
+  private double sellingPrice;
   // @ManyToOne
   // @JoinColumn(name = "library_id", nullable = false)
   // private Library library;

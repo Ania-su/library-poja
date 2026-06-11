@@ -14,7 +14,7 @@ import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.BookRepository;
-import java.math.BigDecimal;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +59,8 @@ class BookCopyServiceTest {
     // Given
     UUID bookId = UUID.randomUUID();
     BookFormat format = BookFormat.HARDBACK;
-    BigDecimal minPrice = new BigDecimal("10.00");
-    BigDecimal maxPrice = new BigDecimal("20.00");
+    double minPrice = 10.00;
+    double maxPrice = 20.00;
     List<BookCopy> expectedCopies = List.of(new BookCopy());
 
     when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(expectedCopies);
@@ -94,7 +94,7 @@ class BookCopyServiceTest {
     BookCopy bookCopyRequest = new BookCopy();
     bookCopyRequest.setId(bookId);
     bookCopyRequest.setFormat(BookFormat.HARDBACK);
-    bookCopyRequest.setSellingPrice(new BigDecimal("10.00"));
+    bookCopyRequest.setSellingPrice(10.00);
 
     Book parentBook = new Book();
     parentBook.setId(bookId);
@@ -108,7 +108,7 @@ class BookCopyServiceTest {
     // Then
     assertEquals(parentBook, savedCopy.getBook());
     assertEquals(BookFormat.HARDBACK, savedCopy.getFormat());
-    assertEquals(new BigDecimal("10.00"), savedCopy.getSellingPrice());
+    assertEquals(10.00, savedCopy.getSellingPrice());
     verify(bookCopyRepository).save(any(BookCopy.class));
   }
 
@@ -116,7 +116,7 @@ class BookCopyServiceTest {
   void save_withNegativePrice_shouldThrowException() {
     // Given
     BookCopy bookCopy = new BookCopy();
-    bookCopy.setSellingPrice(new BigDecimal("-1.00"));
+    bookCopy.setSellingPrice(-1.00);
 
     // When & Then
     assertThrows(IllegalArgumentException.class, () -> bookCopyService.save(bookCopy));
@@ -194,7 +194,7 @@ class BookCopyServiceTest {
     String bookId = UUID.randomUUID().toString();
     BookCopy bookCopy = new BookCopy();
     bookCopy.setId(bookId);
-    bookCopy.setSellingPrice(new BigDecimal("10.00"));
+    bookCopy.setSellingPrice(10.00);
 
     when(bookRepository.findById(bookId)).thenReturn(java.util.Optional.empty());
 
