@@ -6,11 +6,20 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import hei.school.demo.entity.enums.BookFormat;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "book_copy")
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Data
 public class BookCopy {
 
@@ -20,7 +29,6 @@ public class BookCopy {
 
   @ManyToOne
   @JoinColumn(name = "book_id", nullable = false)
-  @JsonIgnore
   private Book book;
 
   @Enumerated(EnumType.STRING)
