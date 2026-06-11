@@ -14,7 +14,6 @@ import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.BookRepository;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +58,7 @@ class BookCopyServiceTest {
     // Given
     UUID bookId = UUID.randomUUID();
     BookFormat format = BookFormat.HARDBACK;
-    double minPrice = 10.00;
+    Double minPrice = 10.00;
     double maxPrice = 20.00;
     List<BookCopy> expectedCopies = List.of(new BookCopy());
 

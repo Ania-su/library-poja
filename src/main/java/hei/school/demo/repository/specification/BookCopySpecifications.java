@@ -2,7 +2,6 @@ package hei.school.demo.repository.specification;
 
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
-
 import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 

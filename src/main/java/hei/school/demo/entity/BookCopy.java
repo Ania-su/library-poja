@@ -2,7 +2,6 @@ package hei.school.demo.entity;
 
 import hei.school.demo.entity.enums.BookFormat;
 import jakarta.persistence.*;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;

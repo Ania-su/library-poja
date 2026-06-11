@@ -8,7 +8,6 @@ import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.BookRepository;
 import hei.school.demo.repository.specification.BookCopySpecifications;
-
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -22,8 +21,7 @@ public class BookCopyService {
   private final BookCopyRepository bookCopyRepository;
   private final BookRepository bookRepository;
 
-  public List<BookCopy> findAll(
-      UUID bookId, BookFormat format, double minPrice, double maxPrice) {
+  public List<BookCopy> findAll(UUID bookId, BookFormat format, Double minPrice, Double maxPrice) {
     Specification<BookCopy> spec =
         Specification.where(BookCopySpecifications.hasBookId(bookId))
             .and(BookCopySpecifications.hasFormat(format))

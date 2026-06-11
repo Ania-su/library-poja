@@ -5,7 +5,6 @@ import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.service.BookCopyService;
-
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
