@@ -1,10 +1,12 @@
 package hei.school.demo.service;
 
 import hei.school.demo.endpoint.rest.controller.dto.BookRequest;
-import hei.school.demo.entity.Author;
 import hei.school.demo.entity.Book;
-import hei.school.demo.entity.Genre;
 import hei.school.demo.repository.BookRepository;
+import hei.school.demo.repository.mapper.BookMapper;
+import hei.school.demo.repository.model.JAuthor;
+import hei.school.demo.repository.model.JBook;
+import hei.school.demo.repository.model.JGenre;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class BookService {
 
   private final BookRepository bookRepository;
+  private final BookMapper bookMapper;
 
   public List<Book> getBooks(
       String title,
@@ -33,9 +36,11 @@ public class BookService {
       int perPage) {
 
     Pageable pageable = PageRequest.of(page - 1, perPage);
-    return bookRepository
-        .findAll(buildSpec(title, description, authorIds, genreIds, before, after), pageable)
-        .getContent();
+    List<JBook> jBooks =
+        bookRepository
+            .findAll(buildSpec(title, description, authorIds, genreIds, before, after), pageable)
+            .getContent();
+    return bookMapper.toDomain(jBooks);
   }
 
   public long countBooks(
@@ -49,7 +54,7 @@ public class BookService {
     return bookRepository.count(buildSpec(title, description, authorIds, genreIds, before, after));
   }
 
-  private Specification<Book> buildSpec(
+  private Specification<JBook> buildSpec(
       String title,
       String description,
       List<String> authorIds,
@@ -58,7 +63,7 @@ public class BookService {
       LocalDate after) {
 
     return (root, query, cb) -> {
-      ArrayList<Predicate> predicates = new ArrayList<Predicate>();
+      ArrayList<Predicate> predicates = new ArrayList<>();
 
       if (title != null && !title.isEmpty()) {
         predicates.add(cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%"));
@@ -70,12 +75,12 @@ public class BookService {
       }
 
       if (authorIds != null && !authorIds.isEmpty()) {
-        Join<Book, Author> authorJoin = root.join("authors");
+        Join<JBook, JAuthor> authorJoin = root.join("authors");
         predicates.add(authorJoin.get("id").in(authorIds));
       }
 
       if (genreIds != null && !genreIds.isEmpty()) {
-        Join<Book, Genre> genreJoin = root.join("genres");
+        Join<JBook, JGenre> genreJoin = root.join("genres");
         predicates.add(genreJoin.get("id").in(genreIds));
       }
 
@@ -100,40 +105,33 @@ public class BookService {
     toSave.setTitle(book.getTitle());
     toSave.setDescription(book.getDescription());
     toSave.setPublicationDate(book.getPublicationDate());
-    if (book.getAuthors() != null) {
-      // toSave.setAuthors(authorRepository.findAllById(book.getAuthors()));
-    }
-    if (book.getGenres() != null) {
-      // toSave.setGenres(genreRepository.findAllById(book.getGenres()));
-    }
-    return bookRepository.save(toSave);
+    JBook jBook = bookMapper.toJpa(toSave);
+    JBook saved = bookRepository.save(jBook);
+    return bookMapper.toDomain(saved);
   }
 
   public Book getBookById(String id) {
-    return bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+    JBook jBook =
+        bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+    return bookMapper.toDomain(jBook);
   }
 
   public Book updateBook(String id, BookRequest book) {
-    Book existing =
+    JBook existing =
         bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
     existing.setTitle(book.getTitle());
     existing.setDescription(book.getDescription());
     existing.setPublicationDate(book.getPublicationDate());
-    if (book.getAuthors() != null) {
-      // existing.setAuthors(authorRepository.findAllById(book.getAuthors()));
-    }
-    if (book.getGenres() != null) {
-      // existing.setGenres(genreRepository.findAllById(book.getGenres()));
-    }
-    return bookRepository.save(existing);
+    JBook saved = bookRepository.save(existing);
+    return bookMapper.toDomain(saved);
   }
 
   public Book deleteBook(String id) {
-    Book book =
+    JBook jBook =
         bookRepository
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
     bookRepository.deleteById(id);
-    return book;
+    return bookMapper.toDomain(jBook);
   }
 }

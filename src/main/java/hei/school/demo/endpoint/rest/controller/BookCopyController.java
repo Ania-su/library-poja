@@ -22,8 +22,8 @@ public class BookCopyController {
   public ResponseEntity<List<BookCopy>> getAllBookCopies(
       @RequestParam(required = false) UUID bookId,
       @RequestParam(required = false) BookFormat format,
-      @RequestParam(required = false) double minPrice,
-      @RequestParam(required = false) double maxPrice) {
+      @RequestParam(required = false) Double minPrice,
+      @RequestParam(required = false) Double maxPrice) {
     return ResponseEntity.ok(copyService.findAll(bookId, format, minPrice, maxPrice));
   }
 

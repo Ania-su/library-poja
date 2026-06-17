@@ -1,26 +1,22 @@
 package hei.school.demo.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import hei.school.demo.endpoint.rest.controller.dto.BookRequest;
 import hei.school.demo.entity.Book;
 import hei.school.demo.repository.BookRepository;
+import hei.school.demo.repository.mapper.AuthorMapper;
+import hei.school.demo.repository.mapper.BookMapper;
+import hei.school.demo.repository.mapper.GenreMapper;
+import hei.school.demo.repository.model.JBook;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
@@ -29,47 +25,31 @@ import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
 public class BookServiceTest {
-  // @Mock
-  // private AuthorRepository authorRepository;
-  // @Mock
-  // private GenreRepository genreRepository;
   @Mock private BookRepository bookRepository;
 
-  @InjectMocks private BookService bookService;
-
-  private Book book1;
-  private Book book2;
+  private BookService bookService;
 
   @BeforeEach
   void setUp() {
-    book1 =
-        new Book(
-            "book-uuid-001",
-            "Méthode Boscher",
-            LocalDate.of(2008, 8, 1),
-            "Livre éducatif pour apprendre le français",
-            null,
-            null,
-            null);
-    book2 =
-        new Book(
-            "book-uuid-002",
-            "Atomic Habits",
-            LocalDate.of(2012, 10, 20),
-            "Change your life with consistency",
-            null,
-            null,
-            null);
+    BookMapper bookMapper = new BookMapper(new AuthorMapper(), new GenreMapper());
+    bookService = new BookService(bookRepository, bookMapper);
   }
 
   @Test
   void getBooks_shouldReturnAllBooks_whenNoFilterProvided() {
+    JBook jBook1 = new JBook();
+    jBook1.setId("book-uuid-001");
+    jBook1.setTitle("Méthode Boscher");
+    jBook1.setPublicationDate(LocalDate.of(2008, 8, 1));
+    jBook1.setDescription("Livre éducatif pour apprendre le français");
+
     when(bookRepository.findAll(any(Specification.class), eq(PageRequest.of(0, 10))))
-        .thenReturn(new PageImpl<>(List.of(book1, book2)));
+        .thenReturn(new PageImpl<>(List.of(jBook1)));
 
     List<Book> result = bookService.getBooks(null, null, null, null, null, null, 1, 10);
 
-    assertEquals(2, result.size());
+    assertEquals(1, result.size());
+    assertEquals("Méthode Boscher", result.get(0).getTitle());
     verify(bookRepository).findAll(any(Specification.class), eq(PageRequest.of(0, 10)));
   }
 
@@ -85,12 +65,17 @@ public class BookServiceTest {
 
   @Test
   void getBooks_shouldRespectPagination_whenPageAndPerPageProvided() {
+    JBook jBook2 = new JBook();
+    jBook2.setId("book-uuid-002");
+    jBook2.setTitle("Atomic Habits");
+
     when(bookRepository.findAll(any(Specification.class), eq(PageRequest.of(1, 5))))
-        .thenReturn(new PageImpl<>(List.of(book2)));
+        .thenReturn(new PageImpl<>(List.of(jBook2)));
 
     List<Book> result = bookService.getBooks(null, null, null, null, null, null, 2, 5);
 
     assertEquals(1, result.size());
+    assertEquals("Atomic Habits", result.get(0).getTitle());
     verify(bookRepository).findAll(any(Specification.class), eq(PageRequest.of(1, 5)));
   }
 
@@ -110,13 +95,13 @@ public class BookServiceTest {
     request.setDescription("Un classique");
     request.setPublicationDate(LocalDate.of(1943, 4, 6));
 
-    Book saved = new Book();
-    saved.setId("generated-uuid");
-    saved.setTitle("Le Petit Prince");
-    saved.setDescription("Un classique");
-    saved.setPublicationDate(LocalDate.of(1943, 4, 6));
+    JBook savedJBook = new JBook();
+    savedJBook.setId("generated-uuid");
+    savedJBook.setTitle("Le Petit Prince");
+    savedJBook.setDescription("Un classique");
+    savedJBook.setPublicationDate(LocalDate.of(1943, 4, 6));
 
-    when(bookRepository.save(any(Book.class))).thenReturn(saved);
+    when(bookRepository.save(any(JBook.class))).thenReturn(savedJBook);
 
     Book result = bookService.createBook(request);
 
@@ -124,16 +109,16 @@ public class BookServiceTest {
     assertEquals("generated-uuid", result.getId());
     assertEquals("Le Petit Prince", result.getTitle());
     assertEquals("Un classique", result.getDescription());
-    verify(bookRepository, times(1)).save(any(Book.class));
+    verify(bookRepository, times(1)).save(any(JBook.class));
   }
 
   @Test
   void testGetBookById() {
-    Book book = new Book();
-    book.setId("123");
-    book.setTitle("1984");
+    JBook jBook = new JBook();
+    jBook.setId("123");
+    jBook.setTitle("1984");
 
-    when(bookRepository.findById("123")).thenReturn(Optional.of(book));
+    when(bookRepository.findById("123")).thenReturn(Optional.of(jBook));
 
     Book result = bookService.getBookById("123");
 
@@ -155,29 +140,30 @@ public class BookServiceTest {
 
   @Test
   void testUpdateBook() {
-    Book existing = new Book();
-    existing.setId("uuid-123");
-    existing.setTitle("Ancien titre");
+    JBook existingJBook = new JBook();
+    existingJBook.setId("uuid-123");
+    existingJBook.setTitle("Ancien titre");
 
     BookRequest request = new BookRequest();
     request.setTitle("Nouveau titre");
     request.setDescription("Nouvelle description");
     request.setPublicationDate(LocalDate.of(2000, 1, 1));
 
-    Book updated = new Book();
-    updated.setId("uuid-123");
-    updated.setTitle("Nouveau titre");
-    updated.setDescription("Nouvelle description");
+    JBook updatedJBook = new JBook();
+    updatedJBook.setId("uuid-123");
+    updatedJBook.setTitle("Nouveau titre");
+    updatedJBook.setDescription("Nouvelle description");
+    updatedJBook.setPublicationDate(LocalDate.of(2000, 1, 1));
 
-    when(bookRepository.findById("uuid-123")).thenReturn(Optional.of(existing));
-    when(bookRepository.save(any(Book.class))).thenReturn(updated);
+    when(bookRepository.findById("uuid-123")).thenReturn(Optional.of(existingJBook));
+    when(bookRepository.save(any(JBook.class))).thenReturn(updatedJBook);
 
     Book result = bookService.updateBook("uuid-123", request);
 
     assertEquals("Nouveau titre", result.getTitle());
     assertEquals("Nouvelle description", result.getDescription());
     verify(bookRepository).findById("uuid-123");
-    verify(bookRepository).save(any(Book.class));
+    verify(bookRepository).save(any(JBook.class));
   }
 
   @Test
