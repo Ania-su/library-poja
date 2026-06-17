@@ -15,7 +15,5 @@ public class Genre {
   private String name;
   private String description;
 
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  private List<Book> books;
+  @ToString.Exclude @EqualsAndHashCode.Exclude private List<Book> books;
 }

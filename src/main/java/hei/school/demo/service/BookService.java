@@ -36,9 +36,10 @@ public class BookService {
       int perPage) {
 
     Pageable pageable = PageRequest.of(page - 1, perPage);
-    List<JBook> jBooks = bookRepository
-        .findAll(buildSpec(title, description, authorIds, genreIds, before, after), pageable)
-        .getContent();
+    List<JBook> jBooks =
+        bookRepository
+            .findAll(buildSpec(title, description, authorIds, genreIds, before, after), pageable)
+            .getContent();
     return bookMapper.toDomain(jBooks);
   }
 
@@ -110,7 +111,8 @@ public class BookService {
   }
 
   public Book getBookById(String id) {
-    JBook jBook = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+    JBook jBook =
+        bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
     return bookMapper.toDomain(jBook);
   }
 

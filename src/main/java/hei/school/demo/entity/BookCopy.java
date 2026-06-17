@@ -17,5 +17,5 @@ public class BookCopy {
   private String id;
   private Book book;
   private BookFormat format;
-  private double sellingPrice;
+  private Double sellingPrice;
 }

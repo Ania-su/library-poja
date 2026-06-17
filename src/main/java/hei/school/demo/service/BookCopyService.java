@@ -56,9 +56,10 @@ public class BookCopyService {
   }
 
   public BookCopy getCopyById(String id) {
-    JBookCopy jBookCopy = bookCopyRepository
-        .findById(id)
-        .orElseThrow(() -> new RuntimeException("Book copy not found"));
+    JBookCopy jBookCopy =
+        bookCopyRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Book copy not found"));
     return bookCopyMapper.toDomain(jBookCopy);
   }
 

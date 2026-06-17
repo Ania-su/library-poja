@@ -29,5 +29,5 @@ public class JBookCopy {
   private BookFormat format;
 
   @Column(name = "selling_price")
-  private double sellingPrice;
+  private Double sellingPrice;
 }

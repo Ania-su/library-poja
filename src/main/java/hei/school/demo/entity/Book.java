@@ -17,9 +17,7 @@ public class Book {
   private LocalDate publicationDate;
   private String description;
 
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  private List<BookCopy> copies;
+  @ToString.Exclude @EqualsAndHashCode.Exclude private List<BookCopy> copies;
 
   private List<Genre> genres;
   private List<Author> authors;

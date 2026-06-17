@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
-import hei.school.demo.entity.Book;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.exception.NotFoundException;
@@ -41,8 +40,7 @@ class BookCopyServiceTest {
     bookCopyService = new BookCopyService(bookCopyRepository, bookRepository, new BookCopyMapper());
 
     List<JBookCopy> copies = new ArrayList<>();
-    JBook jBook =
-        new JBook();
+    JBook jBook = new JBook();
     jBook.setId("book-uuid-001");
     jBook.setTitle("Le petit prince");
     jBook.setPublicationDate(LocalDate.of(2003, 1, 2));

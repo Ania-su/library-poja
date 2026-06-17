@@ -16,7 +16,5 @@ public class Author {
   private String lastName;
   private String biography;
 
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  private List<Book> books;
+  @ToString.Exclude @EqualsAndHashCode.Exclude private List<Book> books;
 }
