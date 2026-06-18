@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -18,6 +19,13 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(BadRequestException.class)
   public ResponseEntity<String> handleBadRequestException(BadRequestException e) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+  }
+
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<String> handleMethodArgumentTypeMismatchException(
+      MethodArgumentTypeMismatchException e) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body("Invalid id '" + e.getValue() + "': must be a valid UUID.");
   }
 
   @ExceptionHandler(Exception.class)
