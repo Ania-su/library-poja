@@ -37,8 +37,7 @@ class BookCopyServiceTest {
 
   @BeforeEach
   void setUp() {
-    bookCopyService = new BookCopyService(bookCopyRepository, bookRepository, new
-BookCopyMapper());
+    bookCopyService = new BookCopyService(bookCopyRepository, bookRepository, new BookCopyMapper());
 
     List<JBookCopy> copies = new ArrayList<>();
     JBook jBook = new JBook();
@@ -67,8 +66,7 @@ BookCopyMapper());
     expectedJCopy.setFormat(BookFormat.HARDBACK);
     expectedJCopy.setSellingPrice(15.0);
 
-
-when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(List.of(expectedJCopy));
+    when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(List.of(expectedJCopy));
 
     List<BookCopy> actualCopies = bookCopyService.findAll(bookId, format, minPrice, maxPrice);
 
@@ -82,7 +80,7 @@ when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(List.of(ex
   void findAll_withNullParams_shouldStillCallRepository() {
     JBookCopy expectedJCopy = new JBookCopy();
 
-when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(List.of(expectedJCopy));
+    when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(List.of(expectedJCopy));
 
     List<BookCopy> actualCopies = bookCopyService.findAll(null, null, null, null);
 
@@ -183,8 +181,7 @@ when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(List.of(ex
     when(bookCopyRepository.findById(notFoundId)).thenReturn(Optional.empty());
 
     NotFoundException ex =
-        assertThrows(
-            NotFoundException.class, () -> bookCopyService.deleteBookCopy(notFoundId));
+        assertThrows(NotFoundException.class, () -> bookCopyService.deleteBookCopy(notFoundId));
 
     assertEquals("BookCopy not found with id : " + notFoundId, ex.getMessage());
     verify(bookCopyRepository, never()).delete((JBookCopy) any());
