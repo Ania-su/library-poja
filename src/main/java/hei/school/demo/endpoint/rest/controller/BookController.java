@@ -6,6 +6,7 @@ import hei.school.demo.entity.Book;
 import hei.school.demo.service.BookService;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,19 +45,19 @@ public class BookController {
   }
 
   @GetMapping("/books/{id}")
-  public ResponseEntity<?> getBookById(@PathVariable String id) {
+  public ResponseEntity<?> getBookById(@PathVariable UUID id) {
     Book book = bookService.getBookById(id);
     return ResponseEntity.ok(book);
   }
 
   @PutMapping("/books/{id}")
-  public ResponseEntity<?> updateBook(@PathVariable String id, @RequestBody BookRequest book) {
+  public ResponseEntity<?> updateBook(@PathVariable UUID id, @RequestBody BookRequest book) {
     Book updated = bookService.updateBook(id, book);
     return ResponseEntity.ok(updated);
   }
 
   @DeleteMapping("/book/{id}")
-  public ResponseEntity<?> deleteBook(@PathVariable String id) {
+  public ResponseEntity<?> deleteBook(@PathVariable UUID id) {
     bookService.deleteBook(id);
     return ResponseEntity.noContent().build();
   }

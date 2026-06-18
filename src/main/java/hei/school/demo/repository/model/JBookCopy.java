@@ -2,6 +2,7 @@ package hei.school.demo.repository.model;
 
 import hei.school.demo.entity.enums.BookFormat;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class JBookCopy {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
-  private String id;
+  private UUID id;
 
   @ManyToOne
   @JoinColumn(name = "book_id", nullable = false)

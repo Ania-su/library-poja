@@ -41,13 +41,13 @@ class BookCopyServiceTest {
 
     List<JBookCopy> copies = new ArrayList<>();
     JBook jBook = new JBook();
-    jBook.setId("book-uuid-001");
+    jBook.setId(UUID.fromString("00000000-0000-0000-0000-111111111112"));
     jBook.setTitle("Le petit prince");
     jBook.setPublicationDate(LocalDate.of(2003, 1, 2));
     jBook.setDescription("this is the description");
 
     jBookCopy = new JBookCopy();
-    jBookCopy.setId("bookcopy-uuid-1");
+    jBookCopy.setId(UUID.fromString("00000000-0000-0000-0000-111111111111"));
     jBookCopy.setBook(jBook);
     jBookCopy.setFormat(BookFormat.POCKET);
     jBookCopy.setSellingPrice(10.0);
@@ -79,6 +79,7 @@ class BookCopyServiceTest {
   @Test
   void findAll_withNullParams_shouldStillCallRepository() {
     JBookCopy expectedJCopy = new JBookCopy();
+
     when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(List.of(expectedJCopy));
 
     List<BookCopy> actualCopies = bookCopyService.findAll(null, null, null, null);
@@ -89,7 +90,7 @@ class BookCopyServiceTest {
 
   @Test
   void save_shouldSaveBookCopy() {
-    String bookId = UUID.randomUUID().toString();
+    UUID bookId = UUID.randomUUID();
     BookCopy bookCopyRequest = new BookCopy();
     bookCopyRequest.setId(bookId);
     bookCopyRequest.setFormat(BookFormat.HARDBACK);
@@ -122,10 +123,11 @@ class BookCopyServiceTest {
     BookCopyUpdate patch = new BookCopyUpdate();
     patch.setFormat(BookFormat.HARDBACK);
 
-    when(bookCopyRepository.findById("bookcopy-uuid-1")).thenReturn(Optional.of(jBookCopy));
+    UUID bookCopyId = jBookCopy.getId();
+    when(bookCopyRepository.findById(bookCopyId)).thenReturn(Optional.of(jBookCopy));
     when(bookCopyRepository.save(any(JBookCopy.class))).thenAnswer(i -> i.getArguments()[0]);
 
-    BookCopy result = bookCopyService.updateBookCopy("bookcopy-uuid-1", patch);
+    BookCopy result = bookCopyService.updateBookCopy(bookCopyId, patch);
 
     assertEquals(BookFormat.HARDBACK, result.getFormat());
     assertEquals(10.0, result.getSellingPrice());
@@ -137,10 +139,11 @@ class BookCopyServiceTest {
     BookCopyUpdate patch = new BookCopyUpdate();
     patch.setSellingPrice(25.0);
 
-    when(bookCopyRepository.findById("bookcopy-uuid-1")).thenReturn(Optional.of(jBookCopy));
+    UUID bookCopyId = jBookCopy.getId();
+    when(bookCopyRepository.findById(bookCopyId)).thenReturn(Optional.of(jBookCopy));
     when(bookCopyRepository.save(any(JBookCopy.class))).thenAnswer(i -> i.getArguments()[0]);
 
-    BookCopy result = bookCopyService.updateBookCopy("bookcopy-uuid-1", patch);
+    BookCopy result = bookCopyService.updateBookCopy(bookCopyId, patch);
 
     assertEquals(25.0, result.getSellingPrice());
     assertEquals(BookFormat.POCKET, result.getFormat());
@@ -149,42 +152,44 @@ class BookCopyServiceTest {
 
   @Test
   void updateBookCopy_shouldThrowNotFoundException_whenIdDoesNotExist() {
-    when(bookCopyRepository.findById("unexisting-uuid-1")).thenReturn(Optional.empty());
+    UUID unexistingId = UUID.fromString("00000000-0000-0000-0000-111111111113");
+    when(bookCopyRepository.findById(unexistingId)).thenReturn(Optional.empty());
 
     NotFoundException ex =
         assertThrows(
             NotFoundException.class,
-            () -> bookCopyService.updateBookCopy("unexisting-uuid-1", new BookCopyUpdate()));
+            () -> bookCopyService.updateBookCopy(unexistingId, new BookCopyUpdate()));
 
-    assertEquals("BookCopy not found with id : unexisting-uuid-1", ex.getMessage());
+    assertEquals("BookCopy not found with id : " + unexistingId, ex.getMessage());
     verify(bookCopyRepository, never()).save(any());
   }
 
   @Test
   void deleteBookCopy_shouldReturnDeletedBookCopy_whenIdExists() {
-    when(bookCopyRepository.findById("bookcopy-uuid-1")).thenReturn(Optional.of(jBookCopy));
+    UUID bookCopyId = jBookCopy.getId();
+    when(bookCopyRepository.findById(bookCopyId)).thenReturn(Optional.of(jBookCopy));
 
-    BookCopy result = bookCopyService.deleteBookCopy("bookcopy-uuid-1");
+    BookCopy result = bookCopyService.deleteBookCopy(bookCopyId);
 
-    assertEquals("bookcopy-uuid-1", result.getId());
+    assertEquals(bookCopyId, result.getId());
     verify(bookCopyRepository).delete(jBookCopy);
   }
 
   @Test
   void deleteBookCopy_shouldThrowNotFoundException_whenIdDoesNotExist() {
-    when(bookCopyRepository.findById("uuid-notfound-1")).thenReturn(Optional.empty());
+    UUID notFoundId = UUID.fromString("00000000-0000-0000-0000-111111111114");
+    when(bookCopyRepository.findById(notFoundId)).thenReturn(Optional.empty());
 
     NotFoundException ex =
-        assertThrows(
-            NotFoundException.class, () -> bookCopyService.deleteBookCopy("uuid-notfound-1"));
+        assertThrows(NotFoundException.class, () -> bookCopyService.deleteBookCopy(notFoundId));
 
-    assertEquals("BookCopy not found with id : uuid-notfound-1", ex.getMessage());
+    assertEquals("BookCopy not found with id : " + notFoundId, ex.getMessage());
     verify(bookCopyRepository, never()).delete((JBookCopy) any());
   }
 
   @Test
   void save_withNonExistentBook_shouldThrowException() {
-    String bookId = UUID.randomUUID().toString();
+    UUID bookId = UUID.randomUUID();
     BookCopy bookCopy = new BookCopy();
     bookCopy.setId(bookId);
     bookCopy.setSellingPrice(10.00);
@@ -196,7 +201,7 @@ class BookCopyServiceTest {
 
   @Test
   void getCopyById_shouldReturnBookCopy() {
-    String id = "test-id";
+    UUID id = UUID.fromString("00000000-0000-0000-0000-111111111115");
     JBookCopy expectedJCopy = new JBookCopy();
     expectedJCopy.setId(id);
     expectedJCopy.setSellingPrice(9.99);
@@ -205,14 +210,14 @@ class BookCopyServiceTest {
 
     BookCopy actualCopy = bookCopyService.getCopyById(id);
 
-    assertEquals("test-id", actualCopy.getId());
+    assertEquals(id, actualCopy.getId());
     assertEquals(9.99, actualCopy.getSellingPrice());
     verify(bookCopyRepository).findById(id);
   }
 
   @Test
   void getCopyById_withNonExistentId_shouldThrowException() {
-    String id = "non-existent-id";
+    UUID id = UUID.fromString("00000000-0000-0000-0000-111111111116");
     when(bookCopyRepository.findById(id)).thenReturn(Optional.empty());
 
     assertThrows(RuntimeException.class, () -> bookCopyService.getCopyById(id));

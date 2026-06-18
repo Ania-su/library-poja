@@ -55,7 +55,7 @@ public class BookCopyService {
     return bookCopyMapper.toDomain(saved);
   }
 
-  public BookCopy getCopyById(String id) {
+  public BookCopy getCopyById(UUID id) {
     JBookCopy jBookCopy =
         bookCopyRepository
             .findById(id)
@@ -63,7 +63,7 @@ public class BookCopyService {
     return bookCopyMapper.toDomain(jBookCopy);
   }
 
-  public BookCopy updateBookCopy(String id, BookCopyUpdate bookCopy) {
+  public BookCopy updateBookCopy(UUID id, BookCopyUpdate bookCopy) {
     JBookCopy existing =
         bookCopyRepository
             .findById(id)
@@ -79,7 +79,7 @@ public class BookCopyService {
     return bookCopyMapper.toDomain(saved);
   }
 
-  public BookCopy deleteBookCopy(String id) {
+  public BookCopy deleteBookCopy(UUID id) {
     JBookCopy jBookCopy =
         bookCopyRepository
             .findById(id)
