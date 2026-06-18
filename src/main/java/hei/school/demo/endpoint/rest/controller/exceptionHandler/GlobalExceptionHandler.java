@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.prefs.BackingStoreException;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -19,7 +17,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(BadRequestException.class)
   public ResponseEntity<String> handleBadRequestException(BadRequestException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
   }
 
   @ExceptionHandler(Exception.class)
