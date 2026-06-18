@@ -14,6 +14,7 @@ import hei.school.demo.repository.model.JBook;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +39,7 @@ public class BookServiceTest {
   @Test
   void getBooks_shouldReturnAllBooks_whenNoFilterProvided() {
     JBook jBook1 = new JBook();
-    jBook1.setId("book-uuid-001");
+    jBook1.setId(UUID.fromString("00000000-0000-0000-0000-111111111112"));
     jBook1.setTitle("Méthode Boscher");
     jBook1.setPublicationDate(LocalDate.of(2008, 8, 1));
     jBook1.setDescription("Livre éducatif pour apprendre le français");
@@ -66,7 +67,7 @@ public class BookServiceTest {
   @Test
   void getBooks_shouldRespectPagination_whenPageAndPerPageProvided() {
     JBook jBook2 = new JBook();
-    jBook2.setId("book-uuid-002");
+    jBook2.setId(UUID.fromString("00000000-0000-0000-0000-111111111117"));
     jBook2.setTitle("Atomic Habits");
 
     when(bookRepository.findAll(any(Specification.class), eq(PageRequest.of(1, 5))))
@@ -96,7 +97,8 @@ public class BookServiceTest {
     request.setPublicationDate(LocalDate.of(1943, 4, 6));
 
     JBook savedJBook = new JBook();
-    savedJBook.setId("generated-uuid");
+    UUID generatedId = UUID.fromString("00000000-0000-0000-0000-111111111118");
+    savedJBook.setId(generatedId);
     savedJBook.setTitle("Le Petit Prince");
     savedJBook.setDescription("Un classique");
     savedJBook.setPublicationDate(LocalDate.of(1943, 4, 6));
@@ -106,7 +108,7 @@ public class BookServiceTest {
     Book result = bookService.createBook(request);
 
     assertNotNull(result);
-    assertEquals("generated-uuid", result.getId());
+    assertEquals(generatedId, result.getId());
     assertEquals("Le Petit Prince", result.getTitle());
     assertEquals("Un classique", result.getDescription());
     verify(bookRepository, times(1)).save(any(JBook.class));
@@ -115,25 +117,27 @@ public class BookServiceTest {
   @Test
   void testGetBookById() {
     JBook jBook = new JBook();
-    jBook.setId("123");
+    UUID bookId = UUID.fromString("00000000-0000-0000-0000-000000000123");
+    jBook.setId(bookId);
     jBook.setTitle("1984");
 
-    when(bookRepository.findById("123")).thenReturn(Optional.of(jBook));
+    when(bookRepository.findById(bookId)).thenReturn(Optional.of(jBook));
 
-    Book result = bookService.getBookById("123");
+    Book result = bookService.getBookById(bookId);
 
     assertNotNull(result);
-    assertEquals("123", result.getId());
+    assertEquals(bookId, result.getId());
     assertEquals("1984", result.getTitle());
-    verify(bookRepository, times(1)).findById("123");
+    verify(bookRepository, times(1)).findById(bookId);
   }
 
   @Test
   void testGetBookById_notFound() {
-    when(bookRepository.findById("unknown")).thenReturn(Optional.empty());
+    UUID unknownId = UUID.fromString("00000000-0000-0000-0000-999999999999");
+    when(bookRepository.findById(unknownId)).thenReturn(Optional.empty());
 
     RuntimeException ex =
-        assertThrows(RuntimeException.class, () -> bookService.getBookById("unknown"));
+        assertThrows(RuntimeException.class, () -> bookService.getBookById(unknownId));
 
     assertTrue(ex.getMessage().contains("Book not found"));
   }
@@ -141,7 +145,8 @@ public class BookServiceTest {
   @Test
   void testUpdateBook() {
     JBook existingJBook = new JBook();
-    existingJBook.setId("uuid-123");
+    UUID updateBookId = UUID.fromString("00000000-0000-0000-0000-000000001234");
+    existingJBook.setId(updateBookId);
     existingJBook.setTitle("Ancien titre");
 
     BookRequest request = new BookRequest();
@@ -150,31 +155,32 @@ public class BookServiceTest {
     request.setPublicationDate(LocalDate.of(2000, 1, 1));
 
     JBook updatedJBook = new JBook();
-    updatedJBook.setId("uuid-123");
+    updatedJBook.setId(updateBookId);
     updatedJBook.setTitle("Nouveau titre");
     updatedJBook.setDescription("Nouvelle description");
     updatedJBook.setPublicationDate(LocalDate.of(2000, 1, 1));
 
-    when(bookRepository.findById("uuid-123")).thenReturn(Optional.of(existingJBook));
+    when(bookRepository.findById(updateBookId)).thenReturn(Optional.of(existingJBook));
     when(bookRepository.save(any(JBook.class))).thenReturn(updatedJBook);
 
-    Book result = bookService.updateBook("uuid-123", request);
+    Book result = bookService.updateBook(updateBookId, request);
 
     assertEquals("Nouveau titre", result.getTitle());
     assertEquals("Nouvelle description", result.getDescription());
-    verify(bookRepository).findById("uuid-123");
+    verify(bookRepository).findById(updateBookId);
     verify(bookRepository).save(any(JBook.class));
   }
 
   @Test
   void testUpdateBook_notFound() {
-    when(bookRepository.findById("unknown")).thenReturn(Optional.empty());
+    UUID unknownId = UUID.fromString("00000000-0000-0000-0000-999999999998");
+    when(bookRepository.findById(unknownId)).thenReturn(Optional.empty());
 
     BookRequest request = new BookRequest();
     request.setTitle("Peu importe");
 
     RuntimeException ex =
-        assertThrows(RuntimeException.class, () -> bookService.updateBook("unknown", request));
+        assertThrows(RuntimeException.class, () -> bookService.updateBook(unknownId, request));
 
     assertTrue(ex.getMessage().contains("Book not found"));
     verify(bookRepository, never()).save(any());

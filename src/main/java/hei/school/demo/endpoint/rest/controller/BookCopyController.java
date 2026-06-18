@@ -53,7 +53,7 @@ public class BookCopyController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<?> getBookCopyById(@PathVariable String id) {
+  public ResponseEntity<?> getBookCopyById(@PathVariable UUID id) {
     BookCopy bookCopy = copyService.getCopyById(id);
 
     return ResponseEntity.ok(bookCopy);
@@ -61,13 +61,13 @@ public class BookCopyController {
 
   @PatchMapping("/book-copies/{id}")
   public ResponseEntity<?> updateBookCopy(
-      @PathVariable String id, @RequestBody BookCopyUpdate bookCopy) {
+      @PathVariable UUID id, @RequestBody BookCopyUpdate bookCopy) {
     BookCopy copy = copyService.updateBookCopy(id, bookCopy);
     return ResponseEntity.ok(copy);
   }
 
   @DeleteMapping("/book-copies/{id}")
-  public ResponseEntity<?> deleteBookCopy(@PathVariable String id) {
+  public ResponseEntity<?> deleteBookCopy(@PathVariable UUID id) {
     BookCopy bookCopy = copyService.deleteBookCopy(id);
     return ResponseEntity.ok(bookCopy);
   }

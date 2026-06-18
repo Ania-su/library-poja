@@ -2,6 +2,7 @@ package hei.school.demo.entity;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +13,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Data
 public class Book {
-  private String id;
+  private UUID id;
   private String title;
   private LocalDate publicationDate;
   private String description;

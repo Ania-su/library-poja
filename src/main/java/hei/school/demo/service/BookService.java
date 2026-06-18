@@ -12,6 +12,7 @@ import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -110,13 +111,13 @@ public class BookService {
     return bookMapper.toDomain(saved);
   }
 
-  public Book getBookById(String id) {
+  public Book getBookById(UUID id) {
     JBook jBook =
         bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
     return bookMapper.toDomain(jBook);
   }
 
-  public Book updateBook(String id, BookRequest book) {
+  public Book updateBook(UUID id, BookRequest book) {
     JBook existing =
         bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
     existing.setTitle(book.getTitle());
@@ -126,7 +127,7 @@ public class BookService {
     return bookMapper.toDomain(saved);
   }
 
-  public Book deleteBook(String id) {
+  public Book deleteBook(UUID id) {
     JBook jBook =
         bookRepository
             .findById(id)
