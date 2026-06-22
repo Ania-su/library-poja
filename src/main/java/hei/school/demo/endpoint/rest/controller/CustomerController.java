@@ -28,14 +28,15 @@ public class CustomerController {
 
   @GetMapping
   public ResponseEntity<Map<String, Object>> getCustomers(
-      @RequestParam(defaultValue = "1") int page,
-      @RequestParam(defaultValue = "10") int perPage) {
+      @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int perPage) {
     List<Customer> customers = customerService.getCustomers(page, perPage);
     long total = customerService.countCustomers();
-    return ResponseEntity.ok(Map.of(
-        "customers", customers,
-        "meta", Map.of("total", total, "page", page, "perPage", perPage)
-    ));
+    return ResponseEntity.ok(
+        Map.of(
+            "customers",
+            customers,
+            "meta",
+            Map.of("total", total, "page", page, "perPage", perPage)));
   }
 
   @PostMapping

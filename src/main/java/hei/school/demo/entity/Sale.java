@@ -22,7 +22,5 @@ public class Sale {
   private PaymentMethod paymentMethod;
   private Double totalAmount;
 
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  private List<SaleItem> items;
+  @ToString.Exclude @EqualsAndHashCode.Exclude private List<SaleItem> items;
 }

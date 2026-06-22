@@ -28,11 +28,11 @@ public class SaleController {
 
   @GetMapping
   public ResponseEntity<SalesResponse> getSales(
-      @RequestParam(defaultValue = "1") int page,
-      @RequestParam(defaultValue = "10") int perPage) {
+      @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int perPage) {
     List<Sale> sales = saleService.getSales(page, perPage);
     long total = saleService.countSales();
-    return ResponseEntity.ok(new SalesResponse(sales, new SalesResponse.Meta(total, page, perPage)));
+    return ResponseEntity.ok(
+        new SalesResponse(sales, new SalesResponse.Meta(total, page, perPage)));
   }
 
   @PostMapping

@@ -40,17 +40,17 @@ public class SaleService {
   }
 
   public Sale getSaleById(UUID id) {
-    JSale jSale = saleRepository
-        .findById(id)
-        .orElseThrow(() -> new RuntimeException("Sale not found"));
+    JSale jSale =
+        saleRepository.findById(id).orElseThrow(() -> new RuntimeException("Sale not found"));
     return saleMapper.toDomain(jSale);
   }
 
   @Transactional
   public Sale createSale(SaleRequest request) {
-    JCustomer jCustomer = customerRepository
-        .findById(request.customerId())
-        .orElseThrow(() -> new RuntimeException("Customer not found"));
+    JCustomer jCustomer =
+        customerRepository
+            .findById(request.customerId())
+            .orElseThrow(() -> new RuntimeException("Customer not found"));
 
     JSale jSale = new JSale();
     jSale.setCustomer(jCustomer);
@@ -62,11 +62,14 @@ public class SaleService {
     double total = 0.0;
 
     for (SaleItemRequest itemReq : request.items()) {
-      JBookCopy jBookCopy = bookCopyRepository
-          .findById(itemReq.bookCopyId())
-          .orElseThrow(() -> new RuntimeException("Book copy not found: " + itemReq.bookCopyId()));
+      JBookCopy jBookCopy =
+          bookCopyRepository
+              .findById(itemReq.bookCopyId())
+              .orElseThrow(
+                  () -> new RuntimeException("Book copy not found: " + itemReq.bookCopyId()));
 
-      if (saleRepository.existsByBookCopyIdAndStatusNot(itemReq.bookCopyId(), SaleStatus.CANCELLED)) {
+      if (saleRepository.existsByBookCopyIdAndStatusNot(
+          itemReq.bookCopyId(), SaleStatus.CANCELLED)) {
         throw new RuntimeException("Book copy is already sold: " + itemReq.bookCopyId());
       }
 
@@ -89,9 +92,8 @@ public class SaleService {
 
   @Transactional
   public Sale updateSale(UUID id, SaleRequest request) {
-    JSale jSale = saleRepository
-        .findById(id)
-        .orElseThrow(() -> new RuntimeException("Sale not found"));
+    JSale jSale =
+        saleRepository.findById(id).orElseThrow(() -> new RuntimeException("Sale not found"));
 
     if (request.saleDate() != null) jSale.setSaleDate(request.saleDate());
     if (request.status() != null) jSale.setStatus(request.status());
@@ -103,9 +105,8 @@ public class SaleService {
 
   @Transactional
   public void deleteSale(UUID id) {
-    JSale jSale = saleRepository
-        .findById(id)
-        .orElseThrow(() -> new RuntimeException("Sale not found"));
+    JSale jSale =
+        saleRepository.findById(id).orElseThrow(() -> new RuntimeException("Sale not found"));
     saleRepository.delete(jSale);
   }
 }

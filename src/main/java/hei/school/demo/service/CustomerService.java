@@ -21,7 +21,8 @@ public class CustomerService {
 
   public List<Customer> getCustomers(int page, int perPage) {
     int pageIndex = Math.max(page - 1, 0);
-    List<JCustomer> jCustomers = customerRepository.findAll(PageRequest.of(pageIndex, perPage)).getContent();
+    List<JCustomer> jCustomers =
+        customerRepository.findAll(PageRequest.of(pageIndex, perPage)).getContent();
     return jCustomers.stream().map(customerMapper::toDomain).toList();
   }
 
@@ -30,9 +31,10 @@ public class CustomerService {
   }
 
   public Customer getCustomerById(UUID id) {
-    JCustomer jCustomer = customerRepository
-        .findById(id)
-        .orElseThrow(() -> new RuntimeException("Customer not found"));
+    JCustomer jCustomer =
+        customerRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Customer not found"));
     return customerMapper.toDomain(jCustomer);
   }
 
@@ -47,9 +49,10 @@ public class CustomerService {
 
   @Transactional
   public Customer updateCustomer(UUID id, CustomerRequest request) {
-    JCustomer jCustomer = customerRepository
-        .findById(id)
-        .orElseThrow(() -> new RuntimeException("Customer not found"));
+    JCustomer jCustomer =
+        customerRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Customer not found"));
     jCustomer.setFullName(request.fullName());
     jCustomer.setEmail(request.email());
     JCustomer saved = customerRepository.save(jCustomer);
@@ -58,9 +61,10 @@ public class CustomerService {
 
   @Transactional
   public void deleteCustomer(UUID id) {
-    JCustomer jCustomer = customerRepository
-        .findById(id)
-        .orElseThrow(() -> new RuntimeException("Customer not found"));
+    JCustomer jCustomer =
+        customerRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Customer not found"));
     customerRepository.delete(jCustomer);
   }
 }
