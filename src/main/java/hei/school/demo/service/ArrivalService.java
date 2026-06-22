@@ -39,7 +39,8 @@ public class ArrivalService {
   }
 
   public Arrival getArrivalById(UUID id) {
-    JArrival jArrival = arrivalRepository.findById(id).orElseThrow(() -> new RuntimeException("Arrival not found"));
+    JArrival jArrival =
+        arrivalRepository.findById(id).orElseThrow(() -> new RuntimeException("Arrival not found"));
     return arrivalMapper.toDomain(jArrival);
   }
 
@@ -52,10 +53,14 @@ public class ArrivalService {
     for (ArrivalItemRequest itemRequest : request.getItems()) {
       JArrivalItem item = new JArrivalItem();
       item.setArrival(jArrival);
-      
-      JBookCopy bookCopy = bookCopyRepository.findById(itemRequest.getBookCopyId())
-          .orElseThrow(() -> new RuntimeException("Book copy not found: " + itemRequest.getBookCopyId()));
-      
+
+      JBookCopy bookCopy =
+          bookCopyRepository
+              .findById(itemRequest.getBookCopyId())
+              .orElseThrow(
+                  () ->
+                      new RuntimeException("Book copy not found: " + itemRequest.getBookCopyId()));
+
       item.setBookCopy(bookCopy);
       item.setQuantity(itemRequest.getQuantity());
       items.add(item);
@@ -68,7 +73,8 @@ public class ArrivalService {
 
   @Transactional
   public Arrival updateArrival(UUID id, ArrivalRequest request) {
-    JArrival existing = arrivalRepository.findById(id).orElseThrow(() -> new RuntimeException("Arrival not found"));
+    JArrival existing =
+        arrivalRepository.findById(id).orElseThrow(() -> new RuntimeException("Arrival not found"));
     existing.setArrivalDate(request.getArrivalDate());
     JArrival saved = arrivalRepository.save(existing);
     return arrivalMapper.toDomain(saved);
