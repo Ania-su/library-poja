@@ -21,6 +21,8 @@ tags:
     description: Physical book copy management
   - name: Arrivals
     description: Arrival management for new book copies
+  - name: Customers
+    description: Customer management
 
 
 # ─────────────────────────────────────────────
@@ -544,6 +546,93 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  # ── Customers ─────────────────────────────────
+  /customers:
+    get:
+      tags: [Customers]
+      summary: List all customers
+      operationId: listCustomers
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          description: Paginated list of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPage'
+
+    post:
+      tags: [Customers]
+      summary: Create a new customer
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerCreation'
+      responses:
+        '201':
+          description: Customer successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /customers/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+
+    get:
+      tags: [Customers]
+      summary: Get a customer by ID
+      operationId: getCustomer
+      responses:
+        '200':
+          description: Customer found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Customers]
+      summary: Update a customer
+      operationId: updateCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdate'
+      responses:
+        '200':
+          description: Customer successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Customers]
+      summary: Delete a customer
+      operationId: deleteCustomer
+      responses:
+        '204':
+          description: Customer successfully deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 # ─────────────────────────────────────────────
 # COMPONENTS
 # ─────────────────────────────────────────────
@@ -975,5 +1064,57 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Arrival'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    # ── Customer ─────────────────────────────
+    Customer:
+      type: object
+      required: [id, fullName, email]
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
+        fullName:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+
+    CustomerCreation:
+      type: object
+      required: [fullName, email]
+      properties:
+        fullName:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+
+    CustomerUpdate:
+      type: object
+      required: [fullName, email]
+      properties:
+        fullName:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+
+    CustomerPage:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
         meta:
           $ref: '#/components/schemas/PaginationMeta'
