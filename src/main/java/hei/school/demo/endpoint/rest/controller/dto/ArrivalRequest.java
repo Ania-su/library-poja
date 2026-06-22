@@ -1,17 +1,15 @@
-package hei.school.demo.entity;
+package hei.school.demo.endpoint.rest.controller.dto;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class Arrival {
-  private UUID id;
+public class ArrivalRequest {
   private LocalDate arrivalDate;
-  private List<ArrivalItem> items;
+  private List<java.util.UUID> bookCopyIds;
 }

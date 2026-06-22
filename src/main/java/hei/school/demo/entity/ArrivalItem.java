@@ -1,7 +1,6 @@
 package hei.school.demo.entity;
 
 import java.util.UUID;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class ArrivalItem {
   private UUID id;
-  private BookCopy bookCopy;
-  private Long bookCopyNumber;
+  private UUID arrivalId;
+  private UUID bookCopyId;
 }
