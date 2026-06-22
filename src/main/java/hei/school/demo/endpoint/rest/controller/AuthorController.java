@@ -44,8 +44,9 @@ public class AuthorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAuthor(@RequestParam UUID id){
-        throw new RuntimeException("not implemented");
+    public ResponseEntity<?> updateAuthor(@RequestParam UUID id, @RequestBody AuthorRequest updateAuthor){
+        Author author = authorService.updateAuthor(id, updateAuthor);
+        return ResponseEntity.ok(author);
     }
     
     @DeleteMapping("/{id}")

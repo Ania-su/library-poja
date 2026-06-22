@@ -37,4 +37,13 @@ public class AuthorService {
         JAuthor jAuthor = authorRepository.findById(id.toString()).orElseThrow(() -> new RuntimeException("Author not found"));
         return authorMapper.toDomain(jAuthor);
     }
+
+    public Author updateAuthor(UUID id, AuthorRequest updateAuthor) {
+        JAuthor existing = authorRepository.findById(id.toString()).orElseThrow(() -> new RuntimeException("Author not found"));
+        existing.setFirstName(updateAuthor.getFirstName());
+        existing.setLastName(updateAuthor.getLastName());
+        existing.setBiography(updateAuthor.getBiography());
+        JAuthor saved = authorRepository.save(existing);
+        return authorMapper.toDomain(saved);
+    }
 }
