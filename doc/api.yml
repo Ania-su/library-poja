@@ -19,6 +19,9 @@ tags:
     description: Book management with multi-criteria search
   - name: Book Copies
     description: Physical book copy management
+  - name: Arrivals
+    description: Arrival management for new book copies
+
 
 # ─────────────────────────────────────────────
 # PATHS
@@ -454,6 +457,93 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  # ── Arrivals ────────────────────────────────────
+  /arrivals:
+    get:
+      tags: [Arrivals]
+      summary: List all arrivals
+      operationId: listArrivals
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          description: Paginated list of arrivals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrivalPage'
+
+    post:
+      tags: [Arrivals]
+      summary: Record a new arrival
+      operationId: createArrival
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArrivalCreation'
+      responses:
+        '201':
+          description: Arrival successfully recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Arrival'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /arrivals/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+
+    get:
+      tags: [Arrivals]
+      summary: Get arrival details by ID
+      operationId: getArrival
+      responses:
+        '200':
+          description: Arrival found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Arrival'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Arrivals]
+      summary: Update an arrival
+      operationId: updateArrival
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArrivalUpdate'
+      responses:
+        '200':
+          description: Arrival successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Arrival'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Arrivals]
+      summary: Delete an arrival record
+      operationId: deleteArrival
+      responses:
+        '204':
+          description: Arrival successfully deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 # ─────────────────────────────────────────────
 # COMPONENTS
 # ─────────────────────────────────────────────
@@ -824,5 +914,66 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BookCopy'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    # ── Arrival ─────────────────────────────────
+    Arrival:
+      type: object
+      required: [id, bookCopyId, arrivalDate, quantity]
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "d1a2b3c4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
+        bookCopyId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        arrivalDate:
+          type: string
+          format: date-time
+          example: "2024-06-21T10:00:00Z"
+        quantity:
+          type: integer
+          minimum: 1
+          example: 5
+
+    ArrivalCreation:
+      type: object
+      required: [bookCopyId, arrivalDate, quantity]
+      properties:
+        bookCopyId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        arrivalDate:
+          type: string
+          format: date-time
+          example: "2024-06-21T10:00:00Z"
+        quantity:
+          type: integer
+          minimum: 1
+          example: 5
+
+    ArrivalUpdate:
+      type: object
+      description: All fields are optional — only provided fields will be updated
+      properties:
+        arrivalDate:
+          type: string
+          format: date-time
+        quantity:
+          type: integer
+          minimum: 1
+
+    ArrivalPage:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Arrival'
         meta:
           $ref: '#/components/schemas/PaginationMeta'
