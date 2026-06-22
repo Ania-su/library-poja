@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class AuthorRequest {
-    private String firstName;
-    private String lastName;
-    private String biography;
+  private String firstName;
+  private String lastName;
+  private String biography;
 }
