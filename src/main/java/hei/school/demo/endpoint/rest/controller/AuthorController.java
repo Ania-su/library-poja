@@ -51,7 +51,8 @@ public class AuthorController {
     
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAuthors(@RequestParam UUID id){
-        throw new RuntimeException("not implemented");
+        authorService.deleteAuthor(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

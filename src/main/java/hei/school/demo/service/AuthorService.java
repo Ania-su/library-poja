@@ -46,4 +46,9 @@ public class AuthorService {
         JAuthor saved = authorRepository.save(existing);
         return authorMapper.toDomain(saved);
     }
+
+    public void deleteAuthor(UUID id) {
+        JAuthor jAuthor = authorRepository.findById(id.toString()).orElseThrow(() -> new RuntimeException("Author not found"));
+        authorRepository.delete(jAuthor);
+    }
 }
