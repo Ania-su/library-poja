@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 public class ArrivalMapper {
 
   public Arrival toDomain(JArrival jArrival) {
-    if (jArrival == null) return null;
+    if (jArrival == null)
+      return null;
     Arrival arrival = new Arrival();
     arrival.setId(jArrival.getId());
     arrival.setArrivalDate(jArrival.getArrivalDate());
@@ -27,7 +28,8 @@ public class ArrivalMapper {
   }
 
   public ArrivalItem toDomain(JArrivalItem jArrivalItem) {
-    if (jArrivalItem == null) return null;
+    if (jArrivalItem == null)
+      return null;
     ArrivalItem item = new ArrivalItem();
     item.setId(jArrivalItem.getId());
     item.setArrivalId(jArrivalItem.getArrival().getId());
@@ -36,7 +38,8 @@ public class ArrivalMapper {
   }
 
   public JArrival toJpa(Arrival arrival) {
-    if (arrival == null) return null;
+    if (arrival == null)
+      return null;
     JArrival jArrival = new JArrival();
     jArrival.setId(arrival.getId());
     jArrival.setArrivalDate(arrival.getArrivalDate());

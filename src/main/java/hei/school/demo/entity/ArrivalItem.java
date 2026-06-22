@@ -12,4 +12,5 @@ public class ArrivalItem {
   private UUID id;
   private UUID arrivalId;
   private UUID bookCopyId;
+  private int quantity;
 }
