@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import hei.school.demo.endpoint.rest.controller.dto.AuthorRequest;
 import hei.school.demo.entity.Author;
 import hei.school.demo.repository.AuthorRepository;
 import hei.school.demo.repository.mapper.AuthorMapper;
@@ -19,5 +20,15 @@ public class AuthorService {
     public List<Author> findAll() {
         List<JAuthor> jAuthors = authorRepository.findAll();
         return authorMapper.toDomain(jAuthors);
+    }
+
+    public Author createAuthor(AuthorRequest newAuthor) {
+        Author author = new Author();
+        author.setFirstName(newAuthor.getFirstName());
+        author.setLastName(newAuthor.getLastName());
+        author.setBiography(newAuthor.getBiography());
+        JAuthor jAuthor = authorMapper.toJpa(author);
+        JAuthor saved = authorRepository.save(jAuthor);
+        return authorMapper.toDomain(saved);
     }
 }

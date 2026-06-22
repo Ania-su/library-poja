@@ -33,7 +33,8 @@ public class AuthorController {
 
     @PostMapping
     public ResponseEntity<?> createNewAuthors(@RequestBody AuthorRequest newAuthor){
-        throw new RuntimeException("not implemented");
+        Author author = authorService.createAuthor(newAuthor);
+        return ResponseEntity.ok(author);
     }
 
     @GetMapping("/{id}")
