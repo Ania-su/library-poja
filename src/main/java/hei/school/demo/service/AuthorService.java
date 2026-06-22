@@ -1,6 +1,7 @@
 package hei.school.demo.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -30,5 +31,10 @@ public class AuthorService {
         JAuthor jAuthor = authorMapper.toJpa(author);
         JAuthor saved = authorRepository.save(jAuthor);
         return authorMapper.toDomain(saved);
+    }
+
+    public Author getAuthorById(UUID id) {
+        JAuthor jAuthor = authorRepository.findById(id.toString()).orElseThrow(() -> new RuntimeException("Author not found"));
+        return authorMapper.toDomain(jAuthor);
     }
 }

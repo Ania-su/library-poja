@@ -39,7 +39,8 @@ public class AuthorController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAuthorById(@RequestParam UUID id){
-        throw new RuntimeException("not implemented");
+        Author author = authorService.getAuthorById(id);
+        return ResponseEntity.ok(author);
     }
 
     @PutMapping("/{id}")
