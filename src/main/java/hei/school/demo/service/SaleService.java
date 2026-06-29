@@ -68,11 +68,6 @@ public class SaleService {
               .orElseThrow(
                   () -> new RuntimeException("Book copy not found: " + itemReq.bookCopyId()));
 
-      if (saleRepository.existsByBookCopyIdAndStatusNot(
-          itemReq.bookCopyId(), SaleStatus.CANCELLED)) {
-        throw new RuntimeException("Book copy is already sold: " + itemReq.bookCopyId());
-      }
-
       JSaleItem item = new JSaleItem();
       item.setSale(jSale);
       item.setBookCopy(jBookCopy);

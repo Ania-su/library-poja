@@ -461,6 +461,23 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /book-copies/{id}/stock:
+    get:
+      tags: [Book Copies]
+      summary: Get stock for a book copy
+      operationId: getBookCopyStock
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Stock calculated as arrivals minus sales
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookStockResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   # ── Arrivals ────────────────────────────────────
   /arrivals:
     get:
@@ -1094,6 +1111,20 @@ components:
             $ref: '#/components/schemas/BookCopy'
         meta:
           $ref: '#/components/schemas/PaginationMeta'
+
+    # ── Book Stock ────────────────────────────
+    BookStockResponse:
+      type: object
+      required: [bookCopyId, stock]
+      properties:
+        bookCopyId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        stock:
+          type: integer
+          minimum: 0
+          example: 7
 
     # ── Arrival ─────────────────────────────────
     ArrivalItem:

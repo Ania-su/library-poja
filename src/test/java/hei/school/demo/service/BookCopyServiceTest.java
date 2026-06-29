@@ -8,8 +8,10 @@ import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.exception.NotFoundException;
+import hei.school.demo.repository.ArrivalRepository;
 import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.BookRepository;
+import hei.school.demo.repository.SaleRepository;
 import hei.school.demo.repository.mapper.BookCopyMapper;
 import hei.school.demo.repository.model.JBook;
 import hei.school.demo.repository.model.JBookCopy;
@@ -30,6 +32,8 @@ class BookCopyServiceTest {
 
   @Mock private BookCopyRepository bookCopyRepository;
   @Mock private BookRepository bookRepository;
+  @Mock private ArrivalRepository arrivalRepository;
+  @Mock private SaleRepository saleRepository;
 
   private BookCopyService bookCopyService;
 
@@ -37,7 +41,7 @@ class BookCopyServiceTest {
 
   @BeforeEach
   void setUp() {
-    bookCopyService = new BookCopyService(bookCopyRepository, bookRepository, new BookCopyMapper());
+    bookCopyService = new BookCopyService(bookCopyRepository, bookRepository, arrivalRepository, saleRepository, new BookCopyMapper());
 
     List<JBookCopy> copies = new ArrayList<>();
     JBook jBook = new JBook();

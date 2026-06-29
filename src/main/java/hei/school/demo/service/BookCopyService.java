@@ -1,11 +1,14 @@
 package hei.school.demo.service;
 
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
+import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.exception.NotFoundException;
+import hei.school.demo.repository.ArrivalRepository;
 import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.BookRepository;
+import hei.school.demo.repository.SaleRepository;
 import hei.school.demo.repository.mapper.BookCopyMapper;
 import hei.school.demo.repository.model.JBook;
 import hei.school.demo.repository.model.JBookCopy;
@@ -22,6 +25,8 @@ public class BookCopyService {
 
   private final BookCopyRepository bookCopyRepository;
   private final BookRepository bookRepository;
+  private final ArrivalRepository arrivalRepository;
+  private final SaleRepository saleRepository;
   private final BookCopyMapper bookCopyMapper;
 
   public List<BookCopy> findAll(UUID bookId, BookFormat format, Double minPrice, Double maxPrice) {
@@ -77,6 +82,16 @@ public class BookCopyService {
     }
     JBookCopy saved = bookCopyRepository.save(existing);
     return bookCopyMapper.toDomain(saved);
+  }
+
+  public BookStockResponse calculateStock(UUID id) {
+    bookCopyRepository
+        .findById(id)
+        .orElseThrow(() -> new NotFoundException("BookCopy not found with id: " + id));
+
+    int arrivalQty = arrivalRepository.sumArrivalQuantityByBookCopyId(id);
+    int saleQty = saleRepository.sumSaleQuantityByBookCopyId(id);
+    return new BookStockResponse(id, arrivalQty - saleQty);
   }
 
   public BookCopy deleteBookCopy(UUID id) {

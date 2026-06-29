@@ -2,6 +2,7 @@ package hei.school.demo.endpoint.rest.controller;
 
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
+import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.service.BookCopyService;
@@ -55,8 +56,12 @@ public class BookCopyController {
   @GetMapping("/{id}")
   public ResponseEntity<?> getBookCopyById(@PathVariable UUID id) {
     BookCopy bookCopy = copyService.getCopyById(id);
-
     return ResponseEntity.ok(bookCopy);
+  }
+
+  @GetMapping("/{id}/stock")
+  public ResponseEntity<BookStockResponse> getStock(@PathVariable UUID id) {
+    return ResponseEntity.ok(copyService.calculateStock(id));
   }
 
   @PatchMapping("/book-copies/{id}")
