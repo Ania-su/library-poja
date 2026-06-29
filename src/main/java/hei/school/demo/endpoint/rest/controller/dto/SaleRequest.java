@@ -11,7 +11,4 @@ public record SaleRequest(
     LocalDate saleDate,
     PaymentMethod paymentMethod,
     SaleStatus status,
-    List<SaleItemRequest> items) {
-
-  public record SaleItemRequest(UUID bookCopyId, int quantity) {}
-}
+    List<SaleItemRequest> items) {}

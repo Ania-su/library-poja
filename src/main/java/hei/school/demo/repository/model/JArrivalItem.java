@@ -23,4 +23,7 @@ public class JArrivalItem {
   @ManyToOne
   @JoinColumn(name = "book_copy_id", nullable = false)
   private JBookCopy bookCopy;
+
+  @Column(name = "quantity", nullable = false)
+  private Integer quantity;
 }

@@ -1,7 +1,7 @@
 package hei.school.demo.service;
 
+import hei.school.demo.endpoint.rest.controller.dto.SaleItemRequest;
 import hei.school.demo.endpoint.rest.controller.dto.SaleRequest;
-import hei.school.demo.endpoint.rest.controller.dto.SaleRequest.SaleItemRequest;
 import hei.school.demo.entity.Sale;
 import hei.school.demo.entity.enums.SaleStatus;
 import hei.school.demo.repository.BookCopyRepository;

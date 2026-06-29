@@ -1096,9 +1096,9 @@ components:
           $ref: '#/components/schemas/PaginationMeta'
 
     # ── Arrival ─────────────────────────────────
-    Arrival:
+    ArrivalItem:
       type: object
-      required: [id, bookCopyId, arrivalDate, quantity]
+      required: [id, bookCopyId, quantity]
       properties:
         id:
           type: string
@@ -1108,31 +1108,51 @@ components:
           type: string
           format: uuid
           example: "550e8400-e29b-41d4-a716-446655440000"
-        arrivalDate:
-          type: string
-          format: date-time
-          example: "2024-06-21T10:00:00Z"
         quantity:
           type: integer
           minimum: 1
           example: 5
 
-    ArrivalCreation:
+    Arrival:
       type: object
-      required: [bookCopyId, arrivalDate, quantity]
+      required: [id, arrivalDate, items]
       properties:
-        bookCopyId:
+        id:
           type: string
           format: uuid
-          example: "550e8400-e29b-41d4-a716-446655440000"
+          example: "d1a2b3c4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
         arrivalDate:
           type: string
           format: date-time
           example: "2024-06-21T10:00:00Z"
-        quantity:
-          type: integer
-          minimum: 1
-          example: 5
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArrivalItem'
+
+    ArrivalCreation:
+      type: object
+      required: [arrivalDate, items]
+      properties:
+        arrivalDate:
+          type: string
+          format: date-time
+          example: "2024-06-21T10:00:00Z"
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [bookCopyId, quantity]
+            properties:
+              bookCopyId:
+                type: string
+                format: uuid
+                example: "550e8400-e29b-41d4-a716-446655440000"
+              quantity:
+                type: integer
+                minimum: 1
+                example: 5
 
     ArrivalUpdate:
       type: object
@@ -1141,9 +1161,6 @@ components:
         arrivalDate:
           type: string
           format: date-time
-        quantity:
-          type: integer
-          minimum: 1
 
     ArrivalPage:
       type: object

@@ -1,11 +1,15 @@
 package hei.school.demo.service;
 
+import hei.school.demo.endpoint.rest.controller.dto.ArrivalItemRequest;
 import hei.school.demo.endpoint.rest.controller.dto.ArrivalRequest;
+import hei.school.demo.endpoint.rest.controller.dto.ArrivalUpdateRequest;
 import hei.school.demo.entity.Arrival;
 import hei.school.demo.repository.ArrivalRepository;
+import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.mapper.ArrivalMapper;
 import hei.school.demo.repository.model.JArrival;
 import hei.school.demo.repository.model.JArrivalItem;
+import hei.school.demo.repository.model.JBookCopy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArrivalService {
 
   private final ArrivalRepository arrivalRepository;
+  private final BookCopyRepository bookCopyRepository;
   private final ArrivalMapper arrivalMapper;
 
   public List<Arrival> getArrivals(int page, int perPage) {
@@ -46,9 +51,17 @@ public class ArrivalService {
     jArrival.setArrivalDate(request.getArrivalDate());
 
     List<JArrivalItem> items = new ArrayList<>();
-    for (UUID bookCopyId : request.getBookCopyIds()) {
+    for (ArrivalItemRequest itemRequest : request.getItems()) {
+      JBookCopy bookCopy =
+          bookCopyRepository
+              .findById(itemRequest.getBookCopyId())
+              .orElseThrow(
+                  () -> new RuntimeException("BookCopy not found: " + itemRequest.getBookCopyId()));
+
       JArrivalItem item = new JArrivalItem();
       item.setArrival(jArrival);
+      item.setBookCopy(bookCopy);
+      item.setQuantity(itemRequest.getQuantity());
       items.add(item);
     }
     jArrival.setItems(items);
@@ -58,10 +71,12 @@ public class ArrivalService {
   }
 
   @Transactional
-  public Arrival updateArrival(UUID id, ArrivalRequest request) {
+  public Arrival updateArrival(UUID id, ArrivalUpdateRequest request) {
     JArrival existing =
         arrivalRepository.findById(id).orElseThrow(() -> new RuntimeException("Arrival not found"));
-    existing.setArrivalDate(request.getArrivalDate());
+    if (request.getArrivalDate() != null) {
+      existing.setArrivalDate(request.getArrivalDate());
+    }
     JArrival saved = arrivalRepository.save(existing);
     return arrivalMapper.toDomain(saved);
   }

@@ -9,13 +9,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class SalesResponse {
   private List<Sale> sales;
-  private Meta meta;
-
-  @Data
-  @AllArgsConstructor
-  public static class Meta {
-    private long total;
-    private int page;
-    private int perPage;
-  }
+  private PaginationMeta meta;
 }

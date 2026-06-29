@@ -1,7 +1,9 @@
 package hei.school.demo.endpoint.rest.controller;
 
 import hei.school.demo.endpoint.rest.controller.dto.ArrivalRequest;
+import hei.school.demo.endpoint.rest.controller.dto.ArrivalUpdateRequest;
 import hei.school.demo.endpoint.rest.controller.dto.ArrivalsResponse;
+import hei.school.demo.endpoint.rest.controller.dto.PaginationMeta;
 import hei.school.demo.entity.Arrival;
 import hei.school.demo.service.ArrivalService;
 import java.util.List;
@@ -26,7 +28,7 @@ public class ArrivalController {
     long total = arrivalService.countArrivals();
 
     ArrivalsResponse response =
-        new ArrivalsResponse(arrivals, new ArrivalsResponse.Meta(total, page, perPage));
+        new ArrivalsResponse(arrivals, new PaginationMeta(total, page, perPage));
 
     return ResponseEntity.ok(response);
   }
@@ -45,7 +47,7 @@ public class ArrivalController {
 
   @PutMapping("/arrivals/{id}")
   public ResponseEntity<?> updateArrival(
-      @PathVariable UUID id, @RequestBody ArrivalRequest request) {
+      @PathVariable UUID id, @RequestBody ArrivalUpdateRequest request) {
     Arrival updated = arrivalService.updateArrival(id, request);
     return ResponseEntity.ok(updated);
   }

@@ -1,5 +1,6 @@
 package hei.school.demo.endpoint.rest.controller;
 
+import hei.school.demo.endpoint.rest.controller.dto.PaginationMeta;
 import hei.school.demo.endpoint.rest.controller.dto.SaleRequest;
 import hei.school.demo.endpoint.rest.controller.dto.SalesResponse;
 import hei.school.demo.entity.Sale;
@@ -31,8 +32,7 @@ public class SaleController {
       @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int perPage) {
     List<Sale> sales = saleService.getSales(page, perPage);
     long total = saleService.countSales();
-    return ResponseEntity.ok(
-        new SalesResponse(sales, new SalesResponse.Meta(total, page, perPage)));
+    return ResponseEntity.ok(new SalesResponse(sales, new PaginationMeta(total, page, perPage)));
   }
 
   @PostMapping
