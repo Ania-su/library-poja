@@ -10,9 +10,12 @@ import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.BookRepository;
 import hei.school.demo.repository.SaleRepository;
 import hei.school.demo.repository.mapper.BookCopyMapper;
+import hei.school.demo.repository.model.JArrivalItem;
 import hei.school.demo.repository.model.JBook;
 import hei.school.demo.repository.model.JBookCopy;
+import hei.school.demo.repository.model.JSaleItem;
 import hei.school.demo.repository.specification.BookCopySpecifications;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -84,13 +87,32 @@ public class BookCopyService {
     return bookCopyMapper.toDomain(saved);
   }
 
-  public BookStockResponse calculateStock(UUID id) {
+  public BookStockResponse calculateStock(UUID id, LocalDate date) {
     bookCopyRepository
         .findById(id)
         .orElseThrow(() -> new NotFoundException("BookCopy not found with id: " + id));
 
-    int arrivalQty = arrivalRepository.sumArrivalQuantityByBookCopyId(id);
-    int saleQty = saleRepository.sumSaleQuantityByBookCopyId(id);
+    int arrivalQty;
+    int saleQty;
+
+    if (date == null) {
+      arrivalQty = arrivalRepository.sumArrivalQuantityByBookCopyId(id);
+      saleQty = saleRepository.sumSaleQuantityByBookCopyId(id);
+    } else {
+      arrivalQty =
+          arrivalRepository
+              .findArrivalItemsByBookCopyIdAndDateBeforeEqual(id, date)
+              .stream()
+              .mapToInt(JArrivalItem::getQuantity)
+              .sum();
+      saleQty =
+          saleRepository
+              .findSaleItemsByBookCopyIdAndDateBeforeEqual(id, date)
+              .stream()
+              .mapToInt(JSaleItem::getQuantity)
+              .sum();
+    }
+
     return new BookStockResponse(id, arrivalQty - saleQty);
   }
 

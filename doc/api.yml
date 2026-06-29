@@ -468,6 +468,14 @@ paths:
       operationId: getBookCopyStock
       parameters:
         - $ref: '#/components/parameters/id'
+        - name: t
+          in: query
+          required: false
+          description: Calculate stock as of this date (inclusive). Uses current stock if omitted.
+          schema:
+            type: string
+            format: date
+            example: "2024-06-21"
       responses:
         '200':
           description: Stock calculated as arrivals minus sales

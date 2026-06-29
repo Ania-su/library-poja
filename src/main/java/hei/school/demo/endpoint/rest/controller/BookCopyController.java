@@ -6,6 +6,7 @@ import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.service.BookCopyService;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -60,8 +61,10 @@ public class BookCopyController {
   }
 
   @GetMapping("/{id}/stock")
-  public ResponseEntity<BookStockResponse> getStock(@PathVariable UUID id) {
-    return ResponseEntity.ok(copyService.calculateStock(id));
+  public ResponseEntity<BookStockResponse> getStock(
+      @PathVariable UUID id,
+      @RequestParam(required = false) LocalDate t) {
+    return ResponseEntity.ok(copyService.calculateStock(id, t));
   }
 
   @PatchMapping("/book-copies/{id}")
