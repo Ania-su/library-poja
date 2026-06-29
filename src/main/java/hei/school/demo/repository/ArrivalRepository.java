@@ -13,11 +13,13 @@ import org.springframework.stereotype.Repository;
 public interface ArrivalRepository extends JpaRepository<JArrival, UUID> {
 
   @Query(
-      "SELECT COALESCE(SUM(ai.quantity), 0) FROM JArrivalItem ai WHERE ai.bookCopy.id = :bookCopyId")
+      "SELECT COALESCE(SUM(ai.quantity), 0) FROM JArrivalItem ai WHERE ai.bookCopy.id ="
+          + " :bookCopyId")
   int sumArrivalQuantityByBookCopyId(UUID bookCopyId);
 
   @Query(
-      "SELECT ai FROM JArrivalItem ai WHERE ai.bookCopy.id = :bookCopyId AND ai.arrival.arrivalDate <= :date")
+      "SELECT ai FROM JArrivalItem ai WHERE ai.bookCopy.id = :bookCopyId AND ai.arrival.arrivalDate"
+          + " <= :date")
   List<JArrivalItem> findArrivalItemsByBookCopyIdAndDateBeforeEqual(
       UUID bookCopyId, LocalDate date);
 }

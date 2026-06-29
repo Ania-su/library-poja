@@ -18,7 +18,7 @@ public interface SaleRepository extends JpaRepository<JSale, UUID> {
   int sumSaleQuantityByBookCopyId(UUID bookCopyId);
 
   @Query(
-      "SELECT si FROM JSaleItem si"
-          + " WHERE si.bookCopy.id = :bookCopyId AND si.sale.saleDate <= :date AND si.sale.status <> 'CANCELLED'")
+      "SELECT si FROM JSaleItem si WHERE si.bookCopy.id = :bookCopyId AND si.sale.saleDate <= :date"
+          + " AND si.sale.status <> 'CANCELLED'")
   List<JSaleItem> findSaleItemsByBookCopyIdAndDateBeforeEqual(UUID bookCopyId, LocalDate date);
 }

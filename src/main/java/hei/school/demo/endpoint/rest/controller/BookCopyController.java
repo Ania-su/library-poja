@@ -62,8 +62,7 @@ public class BookCopyController {
 
   @GetMapping("/{id}/stock")
   public ResponseEntity<BookStockResponse> getStock(
-      @PathVariable UUID id,
-      @RequestParam(required = false) LocalDate t) {
+      @PathVariable UUID id, @RequestParam(required = false) LocalDate t) {
     return ResponseEntity.ok(copyService.calculateStock(id, t));
   }
 

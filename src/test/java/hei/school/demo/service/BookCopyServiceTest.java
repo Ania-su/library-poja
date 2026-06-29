@@ -41,7 +41,13 @@ class BookCopyServiceTest {
 
   @BeforeEach
   void setUp() {
-    bookCopyService = new BookCopyService(bookCopyRepository, bookRepository, arrivalRepository, saleRepository, new BookCopyMapper());
+    bookCopyService =
+        new BookCopyService(
+            bookCopyRepository,
+            bookRepository,
+            arrivalRepository,
+            saleRepository,
+            new BookCopyMapper());
 
     List<JBookCopy> copies = new ArrayList<>();
     JBook jBook = new JBook();

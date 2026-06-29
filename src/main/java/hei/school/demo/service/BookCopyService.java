@@ -100,15 +100,11 @@ public class BookCopyService {
       saleQty = saleRepository.sumSaleQuantityByBookCopyId(id);
     } else {
       arrivalQty =
-          arrivalRepository
-              .findArrivalItemsByBookCopyIdAndDateBeforeEqual(id, date)
-              .stream()
+          arrivalRepository.findArrivalItemsByBookCopyIdAndDateBeforeEqual(id, date).stream()
               .mapToInt(JArrivalItem::getQuantity)
               .sum();
       saleQty =
-          saleRepository
-              .findSaleItemsByBookCopyIdAndDateBeforeEqual(id, date)
-              .stream()
+          saleRepository.findSaleItemsByBookCopyIdAndDateBeforeEqual(id, date).stream()
               .mapToInt(JSaleItem::getQuantity)
               .sum();
     }
