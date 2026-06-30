@@ -461,6 +461,31 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /book-copies/{id}/stock:
+    get:
+      tags: [Book Copies]
+      summary: Get stock for a book copy
+      operationId: getBookCopyStock
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: t
+          in: query
+          required: false
+          description: Calculate stock as of this date (inclusive). Uses current stock if omitted.
+          schema:
+            type: string
+            format: date
+            example: "2024-06-21"
+      responses:
+        '200':
+          description: Stock calculated as arrivals minus sales
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookStockResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   # ── Arrivals ────────────────────────────────────
   /arrivals:
     get:
@@ -1095,10 +1120,28 @@ components:
         meta:
           $ref: '#/components/schemas/PaginationMeta'
 
-    # ── Arrival ─────────────────────────────────
-    Arrival:
+    # ── Book Stock ────────────────────────────
+    BookStockResponse:
       type: object
+<<<<<<< HEAD
+      required: [bookCopyId, stock]
+      properties:
+        bookCopyId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        stock:
+          type: integer
+          minimum: 0
+          example: 7
+
+    # ── Arrival ─────────────────────────────────
+    ArrivalItem:
+      type: object
+      required: [id, bookCopyId, quantity]
+=======
       required: [id, arrivalDate, items]
+>>>>>>> preprod
       properties:
         id:
           type: string
@@ -1126,8 +1169,11 @@ components:
           minimum: 1
           example: 5
 
-    ArrivalCreation:
+    Arrival:
       type: object
+<<<<<<< HEAD
+      required: [id, arrivalDate, items]
+=======
       required: [arrivalDate, items]
       properties:
         arrivalDate:
@@ -1143,15 +1189,52 @@ components:
     ArrivalItemCreation:
       type: object
       required: [bookCopyId, quantity]
+>>>>>>> preprod
       properties:
-        bookCopyId:
+        id:
           type: string
           format: uuid
+<<<<<<< HEAD
+          example: "d1a2b3c4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
+        arrivalDate:
+          type: string
+          format: date-time
+          example: "2024-06-21T10:00:00Z"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArrivalItem'
+
+    ArrivalCreation:
+      type: object
+      required: [arrivalDate, items]
+      properties:
+        arrivalDate:
+          type: string
+          format: date-time
+          example: "2024-06-21T10:00:00Z"
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [bookCopyId, quantity]
+            properties:
+              bookCopyId:
+                type: string
+                format: uuid
+                example: "550e8400-e29b-41d4-a716-446655440000"
+              quantity:
+                type: integer
+                minimum: 1
+                example: 5
+=======
           example: "550e8400-e29b-41d4-a716-446655440000"
         quantity:
           type: integer
           minimum: 1
           example: 5
+>>>>>>> preprod
 
     ArrivalUpdate:
       type: object
@@ -1159,11 +1242,15 @@ components:
       properties:
         arrivalDate:
           type: string
+<<<<<<< HEAD
+          format: date-time
+=======
           format: date
         items:
           type: array
           items:
             $ref: '#/components/schemas/ArrivalItemCreation'
+>>>>>>> preprod
 
     ArrivalPage:
       type: object

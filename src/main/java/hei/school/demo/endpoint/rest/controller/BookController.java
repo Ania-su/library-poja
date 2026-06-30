@@ -2,6 +2,7 @@ package hei.school.demo.endpoint.rest.controller;
 
 import hei.school.demo.endpoint.rest.controller.dto.BookRequest;
 import hei.school.demo.endpoint.rest.controller.dto.BooksResponse;
+import hei.school.demo.endpoint.rest.controller.dto.PaginationMeta;
 import hei.school.demo.entity.Book;
 import hei.school.demo.service.BookService;
 import java.time.LocalDate;
@@ -33,7 +34,7 @@ public class BookController {
         bookService.getBooks(title, description, before, authorId, genreId, after, page, perPage);
     long total = bookService.countBooks(title, description, authorId, genreId, before, after);
 
-    BooksResponse response = new BooksResponse(books, new BooksResponse.Meta(total, page, perPage));
+    BooksResponse response = new BooksResponse(books, new PaginationMeta(total, page, perPage));
 
     return ResponseEntity.ok(response);
   }

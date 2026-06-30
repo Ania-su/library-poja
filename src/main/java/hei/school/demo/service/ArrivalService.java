@@ -2,6 +2,7 @@ package hei.school.demo.service;
 
 import hei.school.demo.endpoint.rest.controller.dto.ArrivalItemRequest;
 import hei.school.demo.endpoint.rest.controller.dto.ArrivalRequest;
+import hei.school.demo.endpoint.rest.controller.dto.ArrivalUpdateRequest;
 import hei.school.demo.entity.Arrival;
 import hei.school.demo.repository.ArrivalRepository;
 import hei.school.demo.repository.BookCopyRepository;
@@ -24,8 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArrivalService {
 
   private final ArrivalRepository arrivalRepository;
-  private final ArrivalMapper arrivalMapper;
   private final BookCopyRepository bookCopyRepository;
+  private final ArrivalMapper arrivalMapper;
 
   public List<Arrival> getArrivals(int page, int perPage) {
     Pageable pageable = PageRequest.of(page - 1, perPage);
@@ -72,10 +73,12 @@ public class ArrivalService {
   }
 
   @Transactional
-  public Arrival updateArrival(UUID id, ArrivalRequest request) {
+  public Arrival updateArrival(UUID id, ArrivalUpdateRequest request) {
     JArrival existing =
         arrivalRepository.findById(id).orElseThrow(() -> new RuntimeException("Arrival not found"));
-    existing.setArrivalDate(request.getArrivalDate());
+    if (request.getArrivalDate() != null) {
+      existing.setArrivalDate(request.getArrivalDate());
+    }
     JArrival saved = arrivalRepository.save(existing);
     return arrivalMapper.toDomain(saved);
   }

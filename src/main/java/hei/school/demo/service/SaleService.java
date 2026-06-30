@@ -1,7 +1,7 @@
 package hei.school.demo.service;
 
+import hei.school.demo.endpoint.rest.controller.dto.SaleItemRequest;
 import hei.school.demo.endpoint.rest.controller.dto.SaleRequest;
-import hei.school.demo.endpoint.rest.controller.dto.SaleRequest.SaleItemRequest;
 import hei.school.demo.entity.Sale;
 import hei.school.demo.entity.enums.SaleStatus;
 import hei.school.demo.repository.BookCopyRepository;
@@ -67,11 +67,6 @@ public class SaleService {
               .findById(itemReq.bookCopyId())
               .orElseThrow(
                   () -> new RuntimeException("Book copy not found: " + itemReq.bookCopyId()));
-
-      if (saleRepository.existsByBookCopyIdAndStatusNot(
-          itemReq.bookCopyId(), SaleStatus.CANCELLED)) {
-        throw new RuntimeException("Book copy is already sold: " + itemReq.bookCopyId());
-      }
 
       JSaleItem item = new JSaleItem();
       item.setSale(jSale);

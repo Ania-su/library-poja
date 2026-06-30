@@ -32,6 +32,7 @@ public class ArrivalMapper {
     item.setId(jArrivalItem.getId());
     item.setArrivalId(jArrivalItem.getArrival().getId());
     item.setBookCopyId(jArrivalItem.getBookCopy().getId());
+    item.setQuantity(jArrivalItem.getQuantity());
     return item;
   }
 
