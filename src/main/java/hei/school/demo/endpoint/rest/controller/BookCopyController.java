@@ -31,33 +31,9 @@ public class BookCopyController {
 
   @PostMapping
   public ResponseEntity<?> createBookCopy(@RequestBody BookCopyCreationDto book) {
-    try {
-      BookCopy bookCopy = new BookCopy();
-      bookCopy.setId(book.bookId());
-
-      if (book.format() != null) {
-        try {
-          bookCopy.setFormat(BookFormat.valueOf(book.format().toUpperCase()));
-        } catch (IllegalArgumentException e) {
-          return ResponseEntity.status(400).body("Invalid enum format value.");
-        }
-      }
-
-      bookCopy.setSellingPrice(book.sellingPrice().doubleValue());
-
-      BookCopy createdCopy = copyService.save(bookCopy);
+      BookCopy createdCopy = copyService.save(book);
 
       return new ResponseEntity<>(createdCopy, HttpStatus.CREATED);
-
-    } catch (Exception e) {
-      return ResponseEntity.status(500).body("Crashing in controller: " + e.getMessage());
-    }
-  }
-
-  @GetMapping("/{id}")
-  public ResponseEntity<?> getBookCopyById(@PathVariable UUID id) {
-    BookCopy bookCopy = copyService.getCopyById(id);
-    return ResponseEntity.ok(bookCopy);
   }
 
   @GetMapping("/{id}/stock")
@@ -65,15 +41,22 @@ public class BookCopyController {
       @PathVariable UUID id, @RequestParam(required = false) LocalDate t) {
     return ResponseEntity.ok(copyService.calculateStock(id, t));
   }
+  
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getBookCopyById(@PathVariable UUID id) {
+    BookCopy bookCopy = copyService.getCopyById(id);
+    return ResponseEntity.ok(bookCopy);
+  }
 
-  @PatchMapping("/book-copies/{id}")
+
+  @PatchMapping("/{id}")
   public ResponseEntity<?> updateBookCopy(
       @PathVariable UUID id, @RequestBody BookCopyUpdate bookCopy) {
     BookCopy copy = copyService.updateBookCopy(id, bookCopy);
     return ResponseEntity.ok(copy);
   }
 
-  @DeleteMapping("/book-copies/{id}")
+  @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteBookCopy(@PathVariable UUID id) {
     BookCopy bookCopy = copyService.deleteBookCopy(id);
     return ResponseEntity.ok(bookCopy);
