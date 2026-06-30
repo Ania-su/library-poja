@@ -1,37 +1,31 @@
 package hei.school.demo.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import hei.school.demo.entity.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-@Entity
-@Table(name = "app_users")
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
+@Getter
 public class AppUser implements UserDetails {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private String id;
+  private UUID id;
 
-  @Column(nullable = false)
   private String email;
 
-  @Column(nullable = false)
   private String passwordHash;
+
+  private UserRole role;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
