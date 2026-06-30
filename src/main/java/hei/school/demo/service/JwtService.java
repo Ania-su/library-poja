@@ -21,9 +21,16 @@ public class JwtService {
     return Keys.hmacShaKeyFor(secretKey.getBytes());
   }
 
-  public String generateToken(UserDetails user) {
+  public String generateToken(UserDetails user) 
+  {
+    String role = user.getAuthorities().stream()
+        .findFirst()
+        .map(r -> r.toString())
+        .orElse(null);
+
     return Jwts.builder()
         .subject(user.getUsername())
+        .claim("role", role)
         .issuedAt(new Date())
         .expiration(new Date(System.currentTimeMillis() + tokenExpiration))
         .signWith(getSecretKey())
@@ -42,6 +49,16 @@ public class JwtService {
         .parseSignedClaims(token)
         .getPayload()
         .getSubject();
+  }
+
+    public String extractRole(String token) {
+
+    return Jwts.parser()
+        .verifyWith(getSecretKey())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .get("role", String.class);
   }
 
   public boolean isTokenExpired(String token) {

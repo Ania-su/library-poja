@@ -1,6 +1,7 @@
 package hei.school.demo.endpoint.rest.controller;
 
-import hei.school.demo.dto.RegisterRequest;
+import hei.school.demo.endpoint.rest.controller.dto.LoginRequest;
+import hei.school.demo.endpoint.rest.controller.dto.RegisterRequest;
 import hei.school.demo.service.AuthService;
 import hei.school.demo.service.EmailAlreadyTakenException;
 import hei.school.demo.service.InvalidCredentialsException;
@@ -25,7 +26,7 @@ public class AuthController {
   public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
     try {
 
-      String token = authService.register(request.getEmail(), request.getPassword());
+      String token = authService.register(request);
       
       ResponseCookie cookie = ResponseCookie.from("jwt", token)
       .httpOnly(true)
@@ -48,7 +49,7 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<String> login(@RequestBody RegisterRequest request) {
+  public ResponseEntity<String> login(@RequestBody LoginRequest request) {
     try {
       String token = authService.login(request.getEmail(), request.getPassword());
 

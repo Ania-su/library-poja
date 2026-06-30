@@ -1,8 +1,11 @@
 package hei.school.demo.repository.mapper;
 
+import org.springframework.stereotype.Service;
+
 import hei.school.demo.entity.AppUser;
 import hei.school.demo.repository.model.JAppUser;
 
+@Service
 public class AppUserMapper {
     
     public AppUser toDomain(JAppUser toMap) {
