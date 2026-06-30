@@ -52,14 +52,16 @@ public class ArrivalService {
 
     List<JArrivalItem> items = new ArrayList<>();
     for (ArrivalItemRequest itemRequest : request.getItems()) {
+      JArrivalItem item = new JArrivalItem();
+      item.setArrival(jArrival);
+
       JBookCopy bookCopy =
           bookCopyRepository
               .findById(itemRequest.getBookCopyId())
               .orElseThrow(
-                  () -> new RuntimeException("BookCopy not found: " + itemRequest.getBookCopyId()));
+                  () ->
+                      new RuntimeException("Book copy not found: " + itemRequest.getBookCopyId()));
 
-      JArrivalItem item = new JArrivalItem();
-      item.setArrival(jArrival);
       item.setBookCopy(bookCopy);
       item.setQuantity(itemRequest.getQuantity());
       items.add(item);

@@ -24,6 +24,5 @@ public class JArrivalItem {
   @JoinColumn(name = "book_copy_id", nullable = false)
   private JBookCopy bookCopy;
 
-  @Column(name = "quantity", nullable = false)
-  private Integer quantity;
+  private int quantity;
 }
