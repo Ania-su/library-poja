@@ -2,9 +2,11 @@ package hei.school.demo.endpoint.rest.controller;
 
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
+import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.service.BookCopyService;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,44 +31,31 @@ public class BookCopyController {
 
   @PostMapping
   public ResponseEntity<?> createBookCopy(@RequestBody BookCopyCreationDto book) {
-    try {
-      BookCopy bookCopy = new BookCopy();
-      bookCopy.setId(book.bookId());
+    BookCopy createdCopy = copyService.save(book);
 
-      if (book.format() != null) {
-        try {
-          bookCopy.setFormat(BookFormat.valueOf(book.format().toUpperCase()));
-        } catch (IllegalArgumentException e) {
-          return ResponseEntity.status(400).body("Invalid enum format value.");
-        }
-      }
+    return new ResponseEntity<>(createdCopy, HttpStatus.CREATED);
+  }
 
-      bookCopy.setSellingPrice(book.sellingPrice().doubleValue());
-
-      BookCopy createdCopy = copyService.save(bookCopy);
-
-      return new ResponseEntity<>(createdCopy, HttpStatus.CREATED);
-
-    } catch (Exception e) {
-      return ResponseEntity.status(500).body("Crashing in controller: " + e.getMessage());
-    }
+  @GetMapping("/{id}/stock")
+  public ResponseEntity<BookStockResponse> getStock(
+      @PathVariable UUID id, @RequestParam(required = false) LocalDate t) {
+    return ResponseEntity.ok(copyService.calculateStock(id, t));
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<?> getBookCopyById(@PathVariable UUID id) {
     BookCopy bookCopy = copyService.getCopyById(id);
-
     return ResponseEntity.ok(bookCopy);
   }
 
-  @PatchMapping("/book-copies/{id}")
+  @PatchMapping("/{id}")
   public ResponseEntity<?> updateBookCopy(
       @PathVariable UUID id, @RequestBody BookCopyUpdate bookCopy) {
     BookCopy copy = copyService.updateBookCopy(id, bookCopy);
     return ResponseEntity.ok(copy);
   }
 
-  @DeleteMapping("/book-copies/{id}")
+  @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteBookCopy(@PathVariable UUID id) {
     BookCopy bookCopy = copyService.deleteBookCopy(id);
     return ResponseEntity.ok(bookCopy);
