@@ -2,6 +2,7 @@ package hei.school.demo.service;
 
 import hei.school.demo.endpoint.rest.controller.dto.BookRequest;
 import hei.school.demo.entity.Book;
+import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.repository.BookRepository;
 import hei.school.demo.repository.mapper.BookMapper;
 import hei.school.demo.repository.model.JAuthor;
@@ -113,13 +114,13 @@ public class BookService {
 
   public Book getBookById(UUID id) {
     JBook jBook =
-        bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+        bookRepository.findById(id).orElseThrow(() -> new NotFoundException("Book not found"));
     return bookMapper.toDomain(jBook);
   }
 
   public Book updateBook(UUID id, BookRequest book) {
     JBook existing =
-        bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+        bookRepository.findById(id).orElseThrow(() -> new NotFoundException("Book not found"));
     existing.setTitle(book.getTitle());
     existing.setDescription(book.getDescription());
     existing.setPublicationDate(book.getPublicationDate());
@@ -131,7 +132,7 @@ public class BookService {
     JBook jBook =
         bookRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+            .orElseThrow(() -> new NotFoundException("Book not found with id: " + id));
     bookRepository.deleteById(id);
     return bookMapper.toDomain(jBook);
   }

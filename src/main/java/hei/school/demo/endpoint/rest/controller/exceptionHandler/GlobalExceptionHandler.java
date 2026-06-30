@@ -7,29 +7,39 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(NotFoundException.class)
-  public ResponseEntity<String> handleNotFound(NotFoundException e) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+  public ResponseEntity<ApiError> handleNotFound(NotFoundException e) {
+    return build(HttpStatus.NOT_FOUND, e.getMessage());
   }
 
   @ExceptionHandler(BadRequestException.class)
-  public ResponseEntity<String> handleBadRequestException(BadRequestException e) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+  public ResponseEntity<ApiError> handleBadRequestException(BadRequestException e) {
+    return build(HttpStatus.BAD_REQUEST, e.getMessage());
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-  public ResponseEntity<String> handleMethodArgumentTypeMismatchException(
+  public ResponseEntity<ApiError> handleMethodArgumentTypeMismatchException(
       MethodArgumentTypeMismatchException e) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body("Invalid id '" + e.getValue() + "': must be a valid UUID.");
+    return build(HttpStatus.BAD_REQUEST, e.getMessage());
+  }
+
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<ApiError> handleNoResourceFound(NoResourceFoundException e) {
+    return build(HttpStatus.NOT_FOUND, "Resource not found: " + e.getResourcePath());
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleGeneric(Exception e) {
-    return ResponseEntity.internalServerError().body(e.getMessage());
+  public ResponseEntity<ApiError> handleGeneric(Exception e) {
+    return build(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+  }
+
+  private ResponseEntity<ApiError> build(HttpStatus status, String message) {
+    ApiError error = new ApiError(status.value(), status.getReasonPhrase(), message);
+    return ResponseEntity.status(status).body(error);
   }
 }

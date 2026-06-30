@@ -8,6 +8,7 @@ import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
+import hei.school.demo.exception.BadRequestException;
 import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.repository.ArrivalRepository;
 import hei.school.demo.repository.BookCopyRepository;
@@ -126,7 +127,7 @@ class BookCopyServiceTest {
     BookCopyCreationDto bookCopy = new BookCopyCreationDto();
     bookCopy.setSellingPrice(-1.00);
 
-    assertThrows(IllegalArgumentException.class, () -> bookCopyService.save(bookCopy));
+    assertThrows(BadRequestException.class, () -> bookCopyService.save(bookCopy));
   }
 
   @Test
@@ -207,7 +208,7 @@ class BookCopyServiceTest {
 
     when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
-    assertThrows(IllegalArgumentException.class, () -> bookCopyService.save(bookCopy));
+    assertThrows(NotFoundException.class, () -> bookCopyService.save(bookCopy));
   }
 
   @Test

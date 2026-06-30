@@ -4,6 +4,7 @@ import hei.school.demo.endpoint.rest.controller.dto.SaleItemRequest;
 import hei.school.demo.endpoint.rest.controller.dto.SaleRequest;
 import hei.school.demo.entity.Sale;
 import hei.school.demo.entity.enums.SaleStatus;
+import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.CustomerRepository;
 import hei.school.demo.repository.SaleRepository;
@@ -41,7 +42,7 @@ public class SaleService {
 
   public Sale getSaleById(UUID id) {
     JSale jSale =
-        saleRepository.findById(id).orElseThrow(() -> new RuntimeException("Sale not found"));
+        saleRepository.findById(id).orElseThrow(() -> new NotFoundException("Sale not found"));
     return saleMapper.toDomain(jSale);
   }
 
@@ -50,7 +51,7 @@ public class SaleService {
     JCustomer jCustomer =
         customerRepository
             .findById(request.customerId())
-            .orElseThrow(() -> new RuntimeException("Customer not found"));
+            .orElseThrow(() -> new NotFoundException("Customer not found"));
 
     JSale jSale = new JSale();
     jSale.setCustomer(jCustomer);
@@ -66,7 +67,7 @@ public class SaleService {
           bookCopyRepository
               .findById(itemReq.bookCopyId())
               .orElseThrow(
-                  () -> new RuntimeException("Book copy not found: " + itemReq.bookCopyId()));
+                  () -> new NotFoundException("Book copy not found: " + itemReq.bookCopyId()));
 
       JSaleItem item = new JSaleItem();
       item.setSale(jSale);
@@ -88,7 +89,7 @@ public class SaleService {
   @Transactional
   public Sale updateSale(UUID id, SaleRequest request) {
     JSale jSale =
-        saleRepository.findById(id).orElseThrow(() -> new RuntimeException("Sale not found"));
+        saleRepository.findById(id).orElseThrow(() -> new NotFoundException("Sale not found"));
 
     if (request.saleDate() != null) jSale.setSaleDate(request.saleDate());
     if (request.status() != null) jSale.setStatus(request.status());
@@ -101,7 +102,7 @@ public class SaleService {
   @Transactional
   public void deleteSale(UUID id) {
     JSale jSale =
-        saleRepository.findById(id).orElseThrow(() -> new RuntimeException("Sale not found"));
+        saleRepository.findById(id).orElseThrow(() -> new NotFoundException("Sale not found"));
     saleRepository.delete(jSale);
   }
 }

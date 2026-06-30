@@ -4,6 +4,7 @@ import hei.school.demo.endpoint.rest.controller.dto.ArrivalItemRequest;
 import hei.school.demo.endpoint.rest.controller.dto.ArrivalRequest;
 import hei.school.demo.endpoint.rest.controller.dto.ArrivalUpdateRequest;
 import hei.school.demo.entity.Arrival;
+import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.repository.ArrivalRepository;
 import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.mapper.ArrivalMapper;
@@ -41,7 +42,9 @@ public class ArrivalService {
 
   public Arrival getArrivalById(UUID id) {
     JArrival jArrival =
-        arrivalRepository.findById(id).orElseThrow(() -> new RuntimeException("Arrival not found"));
+        arrivalRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Arrival not found"));
     return arrivalMapper.toDomain(jArrival);
   }
 
@@ -60,7 +63,7 @@ public class ArrivalService {
               .findById(itemRequest.getBookCopyId())
               .orElseThrow(
                   () ->
-                      new RuntimeException("Book copy not found: " + itemRequest.getBookCopyId()));
+                      new NotFoundException("Book copy not found: " + itemRequest.getBookCopyId()));
 
       item.setBookCopy(bookCopy);
       item.setQuantity(itemRequest.getQuantity());
@@ -75,7 +78,9 @@ public class ArrivalService {
   @Transactional
   public Arrival updateArrival(UUID id, ArrivalUpdateRequest request) {
     JArrival existing =
-        arrivalRepository.findById(id).orElseThrow(() -> new RuntimeException("Arrival not found"));
+        arrivalRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Arrival not found"));
     if (request.getArrivalDate() != null) {
       existing.setArrivalDate(request.getArrivalDate());
     }

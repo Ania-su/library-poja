@@ -2,6 +2,7 @@ package hei.school.demo.service;
 
 import hei.school.demo.endpoint.rest.controller.dto.CustomerRequest;
 import hei.school.demo.entity.Customer;
+import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.repository.CustomerRepository;
 import hei.school.demo.repository.mapper.CustomerMapper;
 import hei.school.demo.repository.model.JCustomer;
@@ -34,7 +35,7 @@ public class CustomerService {
     JCustomer jCustomer =
         customerRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Customer not found"));
+            .orElseThrow(() -> new NotFoundException("Customer not found"));
     return customerMapper.toDomain(jCustomer);
   }
 
@@ -52,7 +53,7 @@ public class CustomerService {
     JCustomer jCustomer =
         customerRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Customer not found"));
+            .orElseThrow(() -> new NotFoundException("Customer not found"));
     jCustomer.setFullName(request.fullName());
     jCustomer.setEmail(request.email());
     JCustomer saved = customerRepository.save(jCustomer);
@@ -64,7 +65,7 @@ public class CustomerService {
     JCustomer jCustomer =
         customerRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Customer not found"));
+            .orElseThrow(() -> new NotFoundException("Customer not found"));
     customerRepository.delete(jCustomer);
   }
 }

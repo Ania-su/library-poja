@@ -5,6 +5,7 @@ import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
+import hei.school.demo.exception.BadRequestException;
 import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.repository.ArrivalRepository;
 import hei.school.demo.repository.BookCopyRepository;
@@ -56,14 +57,14 @@ public class BookCopyService {
     bookCopy.setSellingPrice(book.getSellingPrice().doubleValue());
 
     if (bookCopy.getSellingPrice() < 0) {
-      throw new IllegalArgumentException("Selling price cannot be negative.");
+      throw new BadRequestException("Selling price cannot be negative.");
     }
 
     JBook parentBook =
         bookRepository
             .findById(bookCopy.getId())
             .orElseThrow(
-                () -> new IllegalArgumentException("Book not found with ID: " + bookCopy.getId()));
+                () -> new NotFoundException("Book not found with ID: " + bookCopy.getId()));
 
     JBookCopy jBookCopy = new JBookCopy();
     jBookCopy.setBook(parentBook);
@@ -78,7 +79,7 @@ public class BookCopyService {
     JBookCopy jBookCopy =
         bookCopyRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Book copy not found"));
+            .orElseThrow(() -> new NotFoundException("Book copy not found"));
     return bookCopyMapper.toDomain(jBookCopy);
   }
 
