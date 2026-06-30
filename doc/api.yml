@@ -1098,20 +1098,29 @@ components:
     # ── Arrival ─────────────────────────────────
     Arrival:
       type: object
-      required: [id, bookCopyId, arrivalDate, quantity]
+      required: [id, arrivalDate, items]
       properties:
         id:
           type: string
           format: uuid
           example: "d1a2b3c4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
+        arrivalDate:
+          type: string
+          format: date
+          example: "2024-06-21"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArrivalItem'
+
+    ArrivalItem:
+      type: object
+      required: [bookCopyId, quantity]
+      properties:
         bookCopyId:
           type: string
           format: uuid
           example: "550e8400-e29b-41d4-a716-446655440000"
-        arrivalDate:
-          type: string
-          format: date-time
-          example: "2024-06-21T10:00:00Z"
         quantity:
           type: integer
           minimum: 1
@@ -1119,16 +1128,26 @@ components:
 
     ArrivalCreation:
       type: object
-      required: [bookCopyId, arrivalDate, quantity]
+      required: [arrivalDate, items]
+      properties:
+        arrivalDate:
+          type: string
+          format: date
+          example: "2024-06-21"
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ArrivalItemCreation'
+
+    ArrivalItemCreation:
+      type: object
+      required: [bookCopyId, quantity]
       properties:
         bookCopyId:
           type: string
           format: uuid
           example: "550e8400-e29b-41d4-a716-446655440000"
-        arrivalDate:
-          type: string
-          format: date-time
-          example: "2024-06-21T10:00:00Z"
         quantity:
           type: integer
           minimum: 1
@@ -1140,10 +1159,11 @@ components:
       properties:
         arrivalDate:
           type: string
-          format: date-time
-        quantity:
-          type: integer
-          minimum: 1
+          format: date
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArrivalItemCreation'
 
     ArrivalPage:
       type: object

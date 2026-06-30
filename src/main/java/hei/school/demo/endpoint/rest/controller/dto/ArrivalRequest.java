@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ArrivalRequest {
   private LocalDate arrivalDate;
-  private List<java.util.UUID> bookCopyIds;
+  private List<ArrivalItemRequest> items;
 }
