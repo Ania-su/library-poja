@@ -31,9 +31,9 @@ public class BookCopyController {
 
   @PostMapping
   public ResponseEntity<?> createBookCopy(@RequestBody BookCopyCreationDto book) {
-      BookCopy createdCopy = copyService.save(book);
+    BookCopy createdCopy = copyService.save(book);
 
-      return new ResponseEntity<>(createdCopy, HttpStatus.CREATED);
+    return new ResponseEntity<>(createdCopy, HttpStatus.CREATED);
   }
 
   @GetMapping("/{id}/stock")
@@ -41,13 +41,12 @@ public class BookCopyController {
       @PathVariable UUID id, @RequestParam(required = false) LocalDate t) {
     return ResponseEntity.ok(copyService.calculateStock(id, t));
   }
-  
+
   @GetMapping("/{id}")
   public ResponseEntity<?> getBookCopyById(@PathVariable UUID id) {
     BookCopy bookCopy = copyService.getCopyById(id);
     return ResponseEntity.ok(bookCopy);
   }
-
 
   @PatchMapping("/{id}")
   public ResponseEntity<?> updateBookCopy(

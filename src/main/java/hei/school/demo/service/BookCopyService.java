@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -48,13 +47,13 @@ public class BookCopyService {
   public BookCopy save(BookCopyCreationDto book) {
 
     BookCopy bookCopy = new BookCopy();
-      bookCopy.setId(book.bookId());
+    bookCopy.setId(book.getBookId());
 
-    if (book.format() != null) {
-        bookCopy.setFormat(BookFormat.valueOf(book.format().toUpperCase()));
+    if (book.getFormat() != null) {
+      bookCopy.setFormat(BookFormat.valueOf(book.getFormat().toUpperCase()));
     }
 
-    bookCopy.setSellingPrice(book.sellingPrice().doubleValue());
+    bookCopy.setSellingPrice(book.getSellingPrice().doubleValue());
 
     if (bookCopy.getSellingPrice() < 0) {
       throw new IllegalArgumentException("Selling price cannot be negative.");
