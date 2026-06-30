@@ -1,5 +1,6 @@
 package hei.school.demo.service;
 
+import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
 import hei.school.demo.entity.BookCopy;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,7 +45,17 @@ public class BookCopyService {
     return bookCopyMapper.toDomain(jBookCopies);
   }
 
-  public BookCopy save(BookCopy bookCopy) {
+  public BookCopy save(BookCopyCreationDto book) {
+
+    BookCopy bookCopy = new BookCopy();
+      bookCopy.setId(book.bookId());
+
+    if (book.format() != null) {
+        bookCopy.setFormat(BookFormat.valueOf(book.format().toUpperCase()));
+    }
+
+    bookCopy.setSellingPrice(book.sellingPrice().doubleValue());
+
     if (bookCopy.getSellingPrice() < 0) {
       throw new IllegalArgumentException("Selling price cannot be negative.");
     }
