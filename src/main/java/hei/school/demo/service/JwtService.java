@@ -26,7 +26,7 @@ public class JwtService {
     String role = user.getAuthorities().stream()
         .findFirst()
         .map(r -> r.toString())
-        .orElse(null);
+        .orElse("NO_ROLE");
 
     return Jwts.builder()
         .subject(user.getUsername())

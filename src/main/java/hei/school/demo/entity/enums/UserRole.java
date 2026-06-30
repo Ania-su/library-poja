@@ -1,7 +1,6 @@
 package hei.school.demo.entity.enums;
 
 public enum UserRole {
-    SUPER_ADMIN,
-    ADMIN, 
-    CUSTOMER,
+    ROLE_ADMIN,
+    ROLE_CUSTOMER,
 }

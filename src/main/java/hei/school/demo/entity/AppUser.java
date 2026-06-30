@@ -30,7 +30,7 @@ public class AppUser implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority(role.name()));
+    return List.of(new SimpleGrantedAuthority(this.role.toString()));
   }
 
   @Override

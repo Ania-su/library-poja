@@ -5,6 +5,7 @@ import hei.school.demo.service.CustomUserDetailsService;
 import hei.school.demo.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -26,15 +27,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       HttpServletRequest req, HttpServletResponse res, FilterChain chain)
       throws ServletException, IOException {
 
-    String authHeader = req.getHeader("Authorization");
+    String token = extractTokenFromHeader(req);
+    if (token == null) {
+      token = extractTokenFromCookie(req);
+    }
 
-    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+    if (token == null) {
       chain.doFilter(req, res);
       return;
     }
 
     try {
-      String token = authHeader.substring(7);
       String username = jwtService.extractUsername(token);
 
       if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -50,5 +53,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     } finally {
       chain.doFilter(req, res);
     }
+  }
+
+  private String extractTokenFromHeader(HttpServletRequest req) {
+    String authHeader = req.getHeader("Authorization");
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      return authHeader.substring(7);
+    }
+    return null;
+  }
+
+  private String extractTokenFromCookie(HttpServletRequest req) {
+    Cookie[] cookies = req.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if ("jwt".equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
+    }
+    return null;
   }
 }

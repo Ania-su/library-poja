@@ -13,6 +13,7 @@ public class AppUserMapper {
         user.setEmail(toMap.getEmail());
         user.setId(toMap.getId());
         user.setPasswordHash(toMap.getPasswordHash());
+        user.setRole(toMap.getRole());
         return user;
     }
 
@@ -21,6 +22,7 @@ public class AppUserMapper {
         appUser.setEmail(toMap.getEmail());
         appUser.setId(toMap.getId());
         appUser.setPasswordHash(toMap.getPasswordHash());
+        appUser.setRole(toMap.getRole());
         return appUser;
     }
     
