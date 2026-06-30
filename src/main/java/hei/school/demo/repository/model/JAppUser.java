@@ -1,7 +1,5 @@
 package hei.school.demo.repository.model;
 
-import java.util.UUID;
-
 import hei.school.demo.entity.enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +21,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class JAppUser{
+public class JAppUser {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -37,5 +36,4 @@ public class JAppUser{
   @Enumerated(EnumType.STRING)
   @Column(name = "role")
   private UserRole role;
-
 }

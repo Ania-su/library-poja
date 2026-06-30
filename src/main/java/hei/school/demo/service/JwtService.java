@@ -21,12 +21,9 @@ public class JwtService {
     return Keys.hmacShaKeyFor(secretKey.getBytes());
   }
 
-  public String generateToken(UserDetails user) 
-  {
-    String role = user.getAuthorities().stream()
-        .findFirst()
-        .map(r -> r.toString())
-        .orElse("NO_ROLE");
+  public String generateToken(UserDetails user) {
+    String role =
+        user.getAuthorities().stream().findFirst().map(r -> r.toString()).orElse("NO_ROLE");
 
     return Jwts.builder()
         .subject(user.getUsername())
@@ -51,7 +48,7 @@ public class JwtService {
         .getSubject();
   }
 
-    public String extractRole(String token) {
+  public String extractRole(String token) {
 
     return Jwts.parser()
         .verifyWith(getSecretKey())
