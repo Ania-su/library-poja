@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
@@ -101,9 +102,9 @@ class BookCopyServiceTest {
   @Test
   void save_shouldSaveBookCopy() {
     UUID bookId = UUID.randomUUID();
-    BookCopy bookCopyRequest = new BookCopy();
-    bookCopyRequest.setId(bookId);
-    bookCopyRequest.setFormat(BookFormat.HARDBACK);
+    BookCopyCreationDto bookCopyRequest = new BookCopyCreationDto();
+    bookCopyRequest.setBookId(bookId);
+    bookCopyRequest.setFormat(String.valueOf(BookFormat.HARDBACK));
     bookCopyRequest.setSellingPrice(10.00);
 
     JBook parentJBook = new JBook();
@@ -122,7 +123,7 @@ class BookCopyServiceTest {
 
   @Test
   void save_withNegativePrice_shouldThrowException() {
-    BookCopy bookCopy = new BookCopy();
+    BookCopyCreationDto bookCopy = new BookCopyCreationDto();
     bookCopy.setSellingPrice(-1.00);
 
     assertThrows(IllegalArgumentException.class, () -> bookCopyService.save(bookCopy));
@@ -200,8 +201,8 @@ class BookCopyServiceTest {
   @Test
   void save_withNonExistentBook_shouldThrowException() {
     UUID bookId = UUID.randomUUID();
-    BookCopy bookCopy = new BookCopy();
-    bookCopy.setId(bookId);
+    BookCopyCreationDto bookCopy = new BookCopyCreationDto();
+    bookCopy.setBookId(bookId);
     bookCopy.setSellingPrice(10.00);
 
     when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
