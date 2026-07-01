@@ -7,8 +7,6 @@ import static org.mockito.Mockito.*;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
-import hei.school.demo.repository.model.JArrivalItem;
-import hei.school.demo.repository.model.JSaleItem;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.exception.BadRequestException;
@@ -18,8 +16,10 @@ import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.BookRepository;
 import hei.school.demo.repository.SaleRepository;
 import hei.school.demo.repository.mapper.BookCopyMapper;
+import hei.school.demo.repository.model.JArrivalItem;
 import hei.school.demo.repository.model.JBook;
 import hei.school.demo.repository.model.JBookCopy;
+import hei.school.demo.repository.model.JSaleItem;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,14 +35,10 @@ import org.springframework.data.jpa.domain.Specification;
 @ExtendWith(MockitoExtension.class)
 class BookCopyServiceTest {
 
-  @Mock
-  private BookCopyRepository bookCopyRepository;
-  @Mock
-  private BookRepository bookRepository;
-  @Mock
-  private ArrivalRepository arrivalRepository;
-  @Mock
-  private SaleRepository saleRepository;
+  @Mock private BookCopyRepository bookCopyRepository;
+  @Mock private BookRepository bookRepository;
+  @Mock private ArrivalRepository arrivalRepository;
+  @Mock private SaleRepository saleRepository;
 
   private BookCopyService bookCopyService;
 
@@ -50,12 +46,13 @@ class BookCopyServiceTest {
 
   @BeforeEach
   void setUp() {
-    bookCopyService = new BookCopyService(
-        bookCopyRepository,
-        bookRepository,
-        arrivalRepository,
-        saleRepository,
-        new BookCopyMapper());
+    bookCopyService =
+        new BookCopyService(
+            bookCopyRepository,
+            bookRepository,
+            arrivalRepository,
+            saleRepository,
+            new BookCopyMapper());
 
     List<JBookCopy> copies = new ArrayList<>();
     JBook jBook = new JBook();
@@ -173,9 +170,10 @@ class BookCopyServiceTest {
     UUID unexistingId = UUID.fromString("00000000-0000-0000-0000-111111111113");
     when(bookCopyRepository.findById(unexistingId)).thenReturn(Optional.empty());
 
-    NotFoundException ex = assertThrows(
-        NotFoundException.class,
-        () -> bookCopyService.updateBookCopy(unexistingId, new BookCopyUpdate()));
+    NotFoundException ex =
+        assertThrows(
+            NotFoundException.class,
+            () -> bookCopyService.updateBookCopy(unexistingId, new BookCopyUpdate()));
 
     assertEquals("BookCopy not found with id : " + unexistingId, ex.getMessage());
     verify(bookCopyRepository, never()).save(any());
@@ -197,7 +195,8 @@ class BookCopyServiceTest {
     UUID notFoundId = UUID.fromString("00000000-0000-0000-0000-111111111114");
     when(bookCopyRepository.findById(notFoundId)).thenReturn(Optional.empty());
 
-    NotFoundException ex = assertThrows(NotFoundException.class, () -> bookCopyService.deleteBookCopy(notFoundId));
+    NotFoundException ex =
+        assertThrows(NotFoundException.class, () -> bookCopyService.deleteBookCopy(notFoundId));
 
     assertEquals("BookCopy not found with id : " + notFoundId, ex.getMessage());
     verify(bookCopyRepository, never()).delete((JBookCopy) any());
@@ -271,7 +270,8 @@ class BookCopyServiceTest {
     UUID nonExistentId = UUID.randomUUID();
     when(bookCopyRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
-    assertThrows(NotFoundException.class, () -> bookCopyService.calculateStock(nonExistentId, null));
+    assertThrows(
+        NotFoundException.class, () -> bookCopyService.calculateStock(nonExistentId, null));
   }
 
   @Test

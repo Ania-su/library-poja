@@ -5,13 +5,14 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hei.school.demo.config.JwtAuthFilter;
 import hei.school.demo.config.SecurityConfig;
-import hei.school.demo.entity.BookCopy;
-import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
+import hei.school.demo.entity.BookCopy;
+import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.service.BookCopyService;
 import hei.school.demo.service.CustomUserDetailsService;
 import hei.school.demo.service.JwtService;
@@ -28,24 +29,22 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-@WebMvcTest(controllers = BookCopyController.class, excludeFilters = {
-    @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = { SecurityConfig.class, JwtAuthFilter.class })
-})
+@WebMvcTest(
+    controllers = BookCopyController.class,
+    excludeFilters = {
+      @ComponentScan.Filter(
+          type = FilterType.ASSIGNABLE_TYPE,
+          classes = {SecurityConfig.class, JwtAuthFilter.class})
+    })
 @AutoConfigureMockMvc(addFilters = false)
 class BookCopyControllerTest {
-  @Autowired
-  private MockMvc mockMvc;
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
 
-  @MockBean
-  private BookCopyService copyService;
-  @MockBean
-  JwtService jwtService;
-  @MockBean
-  CustomUserDetailsService customUserDetailsService;
+  @MockBean private BookCopyService copyService;
+  @MockBean JwtService jwtService;
+  @MockBean CustomUserDetailsService customUserDetailsService;
 
   private UUID bookId;
   private UUID copyId;
@@ -65,10 +64,11 @@ class BookCopyControllerTest {
     Double maxPrice = 20.0;
     when(copyService.findAll(bookId, format, minPrice, maxPrice)).thenReturn(List.of(bookCopy));
     mockMvc
-        .perform(get("/books/" + bookId + "/copy")
-            .param("format", format.name())
-            .param("minPrice", minPrice.toString())
-            .param("maxPrice", maxPrice.toString()))
+        .perform(
+            get("/books/" + bookId + "/copy")
+                .param("format", format.name())
+                .param("minPrice", minPrice.toString())
+                .param("maxPrice", maxPrice.toString()))
         .andExpect(status().isOk());
   }
 
@@ -77,17 +77,14 @@ class BookCopyControllerTest {
     LocalDate date = LocalDate.now();
     when(copyService.calculateStock(copyId, date)).thenReturn(new BookStockResponse(copyId, 10));
     mockMvc
-        .perform(get("/books/" + bookId + "/copy/" + copyId + "/stock")
-            .param("t", date.toString()))
+        .perform(get("/books/" + bookId + "/copy/" + copyId + "/stock").param("t", date.toString()))
         .andExpect(status().isOk());
   }
 
   @Test
   void getAllBookCopies_ok() throws Exception {
     when(copyService.findAll(bookId, null, null, null)).thenReturn(List.of(bookCopy));
-    mockMvc
-        .perform(get("/books/" + bookId + "/copy"))
-        .andExpect(status().isOk());
+    mockMvc.perform(get("/books/" + bookId + "/copy")).andExpect(status().isOk());
   }
 
   @Test
@@ -95,9 +92,10 @@ class BookCopyControllerTest {
     BookCopyCreationDto dto = new BookCopyCreationDto();
     when(copyService.save(any())).thenReturn(bookCopy);
     mockMvc
-        .perform(post("/books/" + bookId + "/copy")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(dto)))
+        .perform(
+            post("/books/" + bookId + "/copy")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isCreated());
   }
 
@@ -112,28 +110,26 @@ class BookCopyControllerTest {
   @Test
   void getBookCopyById_ok() throws Exception {
     when(copyService.getCopyById(copyId)).thenReturn(bookCopy);
-    mockMvc
-        .perform(get("/books/" + bookId + "/copy/" + copyId))
-        .andExpect(status().isOk());
+    mockMvc.perform(get("/books/" + bookId + "/copy/" + copyId)).andExpect(status().isOk());
   }
 
   @Test
   void updateBookCopy_ok() throws Exception {
     BookCopyUpdate update = new BookCopyUpdate();
-    when(copyService.updateBookCopy(org.mockito.ArgumentMatchers.eq(copyId), any())).thenReturn(bookCopy);
+    when(copyService.updateBookCopy(org.mockito.ArgumentMatchers.eq(copyId), any()))
+        .thenReturn(bookCopy);
     mockMvc
-        .perform(patch("/books/" + bookId + "/copy/" + copyId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(update)))
+        .perform(
+            patch("/books/" + bookId + "/copy/" + copyId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(update)))
         .andExpect(status().isOk());
   }
 
   @Test
   void deleteBookCopy_ok() throws Exception {
     when(copyService.deleteBookCopy(copyId)).thenReturn(bookCopy);
-    mockMvc
-        .perform(delete("/books/" + bookId + "/copy/" + copyId))
-        .andExpect(status().isOk());
+    mockMvc.perform(delete("/books/" + bookId + "/copy/" + copyId)).andExpect(status().isOk());
   }
 
   private <T> T any() {
