@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
+import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.exception.BadRequestException;
@@ -15,8 +16,10 @@ import hei.school.demo.repository.BookCopyRepository;
 import hei.school.demo.repository.BookRepository;
 import hei.school.demo.repository.SaleRepository;
 import hei.school.demo.repository.mapper.BookCopyMapper;
+import hei.school.demo.repository.model.JArrivalItem;
 import hei.school.demo.repository.model.JBook;
 import hei.school.demo.repository.model.JBookCopy;
+import hei.school.demo.repository.model.JSaleItem;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -225,6 +228,50 @@ class BookCopyServiceTest {
     assertEquals(id, actualCopy.getId());
     assertEquals(9.99, actualCopy.getSellingPrice());
     verify(bookCopyRepository).findById(id);
+  }
+
+  @Test
+  void calculateStock_withoutDate_shouldReturnCorrectStock() {
+    UUID copyId = jBookCopy.getId();
+    when(bookCopyRepository.findById(copyId)).thenReturn(Optional.of(jBookCopy));
+    when(arrivalRepository.sumArrivalQuantityByBookCopyId(copyId)).thenReturn(10);
+    when(saleRepository.sumSaleQuantityByBookCopyId(copyId)).thenReturn(3);
+
+    BookStockResponse response = bookCopyService.calculateStock(copyId, null);
+
+    assertEquals(copyId, response.bookCopyId());
+    assertEquals(7, response.stock());
+  }
+
+  @Test
+  void calculateStock_withDate_shouldReturnCorrectStock() {
+    UUID copyId = jBookCopy.getId();
+    LocalDate date = LocalDate.now();
+    when(bookCopyRepository.findById(copyId)).thenReturn(Optional.of(jBookCopy));
+
+    JArrivalItem arrival = new JArrivalItem();
+    arrival.setQuantity(5);
+    when(arrivalRepository.findArrivalItemsByBookCopyIdAndDateBeforeEqual(copyId, date))
+        .thenReturn(List.of(arrival));
+
+    JSaleItem sale = new JSaleItem();
+    sale.setQuantity(2);
+    when(saleRepository.findSaleItemsByBookCopyIdAndDateBeforeEqual(copyId, date))
+        .thenReturn(List.of(sale));
+
+    BookStockResponse response = bookCopyService.calculateStock(copyId, date);
+
+    assertEquals(copyId, response.bookCopyId());
+    assertEquals(3, response.stock());
+  }
+
+  @Test
+  void calculateStock_nonExistentId_shouldThrowNotFoundException() {
+    UUID nonExistentId = UUID.randomUUID();
+    when(bookCopyRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class, () -> bookCopyService.calculateStock(nonExistentId, null));
   }
 
   @Test
