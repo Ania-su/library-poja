@@ -6,6 +6,9 @@ import static org.mockito.Mockito.*;
 
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
+import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
+import hei.school.demo.repository.model.JArrivalItem;
+import hei.school.demo.repository.model.JSaleItem;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.exception.BadRequestException;
@@ -32,10 +35,14 @@ import org.springframework.data.jpa.domain.Specification;
 @ExtendWith(MockitoExtension.class)
 class BookCopyServiceTest {
 
-  @Mock private BookCopyRepository bookCopyRepository;
-  @Mock private BookRepository bookRepository;
-  @Mock private ArrivalRepository arrivalRepository;
-  @Mock private SaleRepository saleRepository;
+  @Mock
+  private BookCopyRepository bookCopyRepository;
+  @Mock
+  private BookRepository bookRepository;
+  @Mock
+  private ArrivalRepository arrivalRepository;
+  @Mock
+  private SaleRepository saleRepository;
 
   private BookCopyService bookCopyService;
 
@@ -43,13 +50,12 @@ class BookCopyServiceTest {
 
   @BeforeEach
   void setUp() {
-    bookCopyService =
-        new BookCopyService(
-            bookCopyRepository,
-            bookRepository,
-            arrivalRepository,
-            saleRepository,
-            new BookCopyMapper());
+    bookCopyService = new BookCopyService(
+        bookCopyRepository,
+        bookRepository,
+        arrivalRepository,
+        saleRepository,
+        new BookCopyMapper());
 
     List<JBookCopy> copies = new ArrayList<>();
     JBook jBook = new JBook();
@@ -167,10 +173,9 @@ class BookCopyServiceTest {
     UUID unexistingId = UUID.fromString("00000000-0000-0000-0000-111111111113");
     when(bookCopyRepository.findById(unexistingId)).thenReturn(Optional.empty());
 
-    NotFoundException ex =
-        assertThrows(
-            NotFoundException.class,
-            () -> bookCopyService.updateBookCopy(unexistingId, new BookCopyUpdate()));
+    NotFoundException ex = assertThrows(
+        NotFoundException.class,
+        () -> bookCopyService.updateBookCopy(unexistingId, new BookCopyUpdate()));
 
     assertEquals("BookCopy not found with id : " + unexistingId, ex.getMessage());
     verify(bookCopyRepository, never()).save(any());
@@ -192,8 +197,7 @@ class BookCopyServiceTest {
     UUID notFoundId = UUID.fromString("00000000-0000-0000-0000-111111111114");
     when(bookCopyRepository.findById(notFoundId)).thenReturn(Optional.empty());
 
-    NotFoundException ex =
-        assertThrows(NotFoundException.class, () -> bookCopyService.deleteBookCopy(notFoundId));
+    NotFoundException ex = assertThrows(NotFoundException.class, () -> bookCopyService.deleteBookCopy(notFoundId));
 
     assertEquals("BookCopy not found with id : " + notFoundId, ex.getMessage());
     verify(bookCopyRepository, never()).delete((JBookCopy) any());
@@ -225,6 +229,49 @@ class BookCopyServiceTest {
     assertEquals(id, actualCopy.getId());
     assertEquals(9.99, actualCopy.getSellingPrice());
     verify(bookCopyRepository).findById(id);
+  }
+
+  @Test
+  void calculateStock_withoutDate_shouldReturnCorrectStock() {
+    UUID copyId = jBookCopy.getId();
+    when(bookCopyRepository.findById(copyId)).thenReturn(Optional.of(jBookCopy));
+    when(arrivalRepository.sumArrivalQuantityByBookCopyId(copyId)).thenReturn(10);
+    when(saleRepository.sumSaleQuantityByBookCopyId(copyId)).thenReturn(3);
+
+    BookStockResponse response = bookCopyService.calculateStock(copyId, null);
+
+    assertEquals(copyId, response.bookCopyId());
+    assertEquals(7, response.stock());
+  }
+
+  @Test
+  void calculateStock_withDate_shouldReturnCorrectStock() {
+    UUID copyId = jBookCopy.getId();
+    LocalDate date = LocalDate.now();
+    when(bookCopyRepository.findById(copyId)).thenReturn(Optional.of(jBookCopy));
+
+    JArrivalItem arrival = new JArrivalItem();
+    arrival.setQuantity(5);
+    when(arrivalRepository.findArrivalItemsByBookCopyIdAndDateBeforeEqual(copyId, date))
+        .thenReturn(List.of(arrival));
+
+    JSaleItem sale = new JSaleItem();
+    sale.setQuantity(2);
+    when(saleRepository.findSaleItemsByBookCopyIdAndDateBeforeEqual(copyId, date))
+        .thenReturn(List.of(sale));
+
+    BookStockResponse response = bookCopyService.calculateStock(copyId, date);
+
+    assertEquals(copyId, response.bookCopyId());
+    assertEquals(3, response.stock());
+  }
+
+  @Test
+  void calculateStock_nonExistentId_shouldThrowNotFoundException() {
+    UUID nonExistentId = UUID.randomUUID();
+    when(bookCopyRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+    assertThrows(NotFoundException.class, () -> bookCopyService.calculateStock(nonExistentId, null));
   }
 
   @Test
