@@ -1,21 +1,16 @@
 package hei.school.demo.endpoint.rest.controller;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hei.school.demo.config.JwtAuthFilter;
-import hei.school.demo.config.SecurityConfig;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.service.BookCopyService;
-import hei.school.demo.service.CustomUserDetailsService;
-import hei.school.demo.service.JwtService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -25,26 +20,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(
-    controllers = BookCopyController.class,
-    excludeFilters = {
-      @ComponentScan.Filter(
-          type = FilterType.ASSIGNABLE_TYPE,
-          classes = {SecurityConfig.class, JwtAuthFilter.class})
-    })
+@WebMvcTest(controllers = BookCopyController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class BookCopyControllerTest {
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private BookCopyService copyService;
-  @MockBean JwtService jwtService;
-  @MockBean CustomUserDetailsService customUserDetailsService;
 
   private UUID bookId;
   private UUID copyId;

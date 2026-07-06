@@ -4,14 +4,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import hei.school.demo.config.JwtAuthFilter;
-import hei.school.demo.config.SecurityConfig;
 import hei.school.demo.entity.Book;
 import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.service.BookCopyService;
 import hei.school.demo.service.BookService;
-import hei.school.demo.service.CustomUserDetailsService;
-import hei.school.demo.service.JwtService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,18 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@WebMvcTest(
-    controllers = BookController.class,
-    excludeFilters = {
-      @ComponentScan.Filter(
-          type = FilterType.ASSIGNABLE_TYPE,
-          classes = {SecurityConfig.class, JwtAuthFilter.class})
-    })
+@WebMvcTest(controllers = BookController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class BookControllerTest {
   private Book book1;
@@ -42,10 +30,6 @@ class BookControllerTest {
   @MockBean private BookService bookService;
 
   @MockBean private BookCopyService bookCopyService;
-
-  @MockBean JwtService jwtService;
-
-  @MockBean CustomUserDetailsService customUserDetailsService;
 
   @BeforeEach
   void setUp() {
