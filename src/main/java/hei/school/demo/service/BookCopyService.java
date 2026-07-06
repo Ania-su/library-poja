@@ -3,6 +3,7 @@ package hei.school.demo.service;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
+import hei.school.demo.endpoint.rest.controller.dto.LowStockResponse;
 import hei.school.demo.entity.BookCopy;
 import hei.school.demo.entity.enums.BookFormat;
 import hei.school.demo.exception.BadRequestException;
@@ -18,6 +19,7 @@ import hei.school.demo.repository.model.JBookCopy;
 import hei.school.demo.repository.model.JSaleItem;
 import hei.school.demo.repository.specification.BookCopySpecifications;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -131,5 +133,27 @@ public class BookCopyService {
             .orElseThrow(() -> new NotFoundException("BookCopy not found with id : " + id));
     bookCopyRepository.delete(jBookCopy);
     return bookCopyMapper.toDomain(jBookCopy);
+  }
+
+  public List<LowStockResponse> getLowStockCopies(int threshold) {
+    List<Object[]> results = bookCopyRepository.findLowStockCopies(threshold);
+
+    java.util.Map<UUID, LowStockResponse> bookMap = new java.util.HashMap<>();
+
+    for (Object[] row : results) {
+      UUID bookId = (UUID) row[0];
+      String title = (String) row[1];
+      UUID copyId = (UUID) row[2];
+      hei.school.demo.entity.enums.BookFormat format =
+          (hei.school.demo.entity.enums.BookFormat) row[3];
+      int stock = ((Number) row[4]).intValue();
+
+      LowStockResponse bookResponse =
+          bookMap.computeIfAbsent(bookId, id -> new LowStockResponse(id, title, new ArrayList<>()));
+
+      bookResponse.getCopies().add(new LowStockResponse.LowStockCopy(copyId, format, stock));
+    }
+
+    return new java.util.ArrayList<>(bookMap.values());
   }
 }
