@@ -1,13 +1,5 @@
 package hei.school.demo.service;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyCreationDto;
 import hei.school.demo.endpoint.rest.controller.dto.BookCopyUpdate;
 import hei.school.demo.endpoint.rest.controller.dto.BookStockResponse;
@@ -26,7 +18,13 @@ import hei.school.demo.repository.model.JBook;
 import hei.school.demo.repository.model.JBookCopy;
 import hei.school.demo.repository.model.JSaleItem;
 import hei.school.demo.repository.specification.BookCopySpecifications;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
@@ -39,10 +37,11 @@ public class BookCopyService {
   private final BookCopyMapper bookCopyMapper;
 
   public List<BookCopy> findAll(UUID bookId, BookFormat format, Double minPrice, Double maxPrice) {
-    Specification<JBookCopy> spec = Specification.where(BookCopySpecifications.hasBookId(bookId))
-        .and(BookCopySpecifications.hasFormat(format))
-        .and(BookCopySpecifications.priceGreaterThanOrEqualTo(minPrice))
-        .and(BookCopySpecifications.priceLessThanOrEqualTo(maxPrice));
+    Specification<JBookCopy> spec =
+        Specification.where(BookCopySpecifications.hasBookId(bookId))
+            .and(BookCopySpecifications.hasFormat(format))
+            .and(BookCopySpecifications.priceGreaterThanOrEqualTo(minPrice))
+            .and(BookCopySpecifications.priceLessThanOrEqualTo(maxPrice));
 
     List<JBookCopy> jBookCopies = bookCopyRepository.findAll(spec);
     return bookCopyMapper.toDomain(jBookCopies);
@@ -63,10 +62,11 @@ public class BookCopyService {
       throw new BadRequestException("Selling price cannot be negative.");
     }
 
-    JBook parentBook = bookRepository
-        .findById(bookCopy.getId())
-        .orElseThrow(
-            () -> new NotFoundException("Book not found with ID: " + bookCopy.getId()));
+    JBook parentBook =
+        bookRepository
+            .findById(bookCopy.getId())
+            .orElseThrow(
+                () -> new NotFoundException("Book not found with ID: " + bookCopy.getId()));
 
     JBookCopy jBookCopy = new JBookCopy();
     jBookCopy.setBook(parentBook);
@@ -78,16 +78,18 @@ public class BookCopyService {
   }
 
   public BookCopy getCopyById(UUID id) {
-    JBookCopy jBookCopy = bookCopyRepository
-        .findById(id)
-        .orElseThrow(() -> new NotFoundException("Book copy not found"));
+    JBookCopy jBookCopy =
+        bookCopyRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Book copy not found"));
     return bookCopyMapper.toDomain(jBookCopy);
   }
 
   public BookCopy updateBookCopy(UUID id, BookCopyUpdate bookCopy) {
-    JBookCopy existing = bookCopyRepository
-        .findById(id)
-        .orElseThrow(() -> new NotFoundException("BookCopy not found with id : " + id));
+    JBookCopy existing =
+        bookCopyRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("BookCopy not found with id : " + id));
 
     if (bookCopy.getFormat() != null) {
       existing.setFormat(bookCopy.getFormat());
@@ -111,21 +113,24 @@ public class BookCopyService {
       arrivalQty = arrivalRepository.sumArrivalQuantityByBookCopyId(id);
       saleQty = saleRepository.sumSaleQuantityByBookCopyId(id);
     } else {
-      arrivalQty = arrivalRepository.findArrivalItemsByBookCopyIdAndDateBeforeEqual(id, date).stream()
-          .mapToInt(JArrivalItem::getQuantity)
-          .sum();
-      saleQty = saleRepository.findSaleItemsByBookCopyIdAndDateBeforeEqual(id, date).stream()
-          .mapToInt(JSaleItem::getQuantity)
-          .sum();
+      arrivalQty =
+          arrivalRepository.findArrivalItemsByBookCopyIdAndDateBeforeEqual(id, date).stream()
+              .mapToInt(JArrivalItem::getQuantity)
+              .sum();
+      saleQty =
+          saleRepository.findSaleItemsByBookCopyIdAndDateBeforeEqual(id, date).stream()
+              .mapToInt(JSaleItem::getQuantity)
+              .sum();
     }
 
     return new BookStockResponse(id, arrivalQty - saleQty);
   }
 
   public BookCopy deleteBookCopy(UUID id) {
-    JBookCopy jBookCopy = bookCopyRepository
-        .findById(id)
-        .orElseThrow(() -> new NotFoundException("BookCopy not found with id : " + id));
+    JBookCopy jBookCopy =
+        bookCopyRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("BookCopy not found with id : " + id));
     bookCopyRepository.delete(jBookCopy);
     return bookCopyMapper.toDomain(jBookCopy);
   }
@@ -139,16 +144,16 @@ public class BookCopyService {
       UUID bookId = (UUID) row[0];
       String title = (String) row[1];
       UUID copyId = (UUID) row[2];
-      hei.school.demo.entity.enums.BookFormat format = (hei.school.demo.entity.enums.BookFormat) row[3];
+      hei.school.demo.entity.enums.BookFormat format =
+          (hei.school.demo.entity.enums.BookFormat) row[3];
       int stock = ((Number) row[4]).intValue();
 
-      LowStockResponse bookResponse = bookMap.computeIfAbsent(bookId,
-          id -> new LowStockResponse(id, title, new ArrayList<>()));
+      LowStockResponse bookResponse =
+          bookMap.computeIfAbsent(bookId, id -> new LowStockResponse(id, title, new ArrayList<>()));
 
       bookResponse.getCopies().add(new LowStockResponse.LowStockCopy(copyId, format, stock));
     }
 
     return new java.util.ArrayList<>(bookMap.values());
   }
-
 }
