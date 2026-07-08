@@ -48,4 +48,16 @@ class GenreControllerTest {
         .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(0));
   }
+
+  @Test
+  void findGenreProfit_shouldReturn500_whenServiceThrows() throws Exception {
+    when(genreService.findGenreProfit()).thenThrow(new RuntimeException("database unavailable"));
+
+    mockMvc
+        .perform(get("/genres/profits"))
+        .andExpect(status().isInternalServerError())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(500))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Internal Server Error"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("database unavailable"));
+  }
 }
