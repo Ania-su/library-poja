@@ -126,6 +126,14 @@ public class BookCopyService {
     return new BookStockResponse(id, arrivalQty - saleQty);
   }
 
+  public BookStockResponse calculateTotalStock(UUID bookId, LocalDate date) {
+    List<BookCopy> copies = findAll(bookId, null, null, null);
+
+    int total = copies.stream().mapToInt(copy -> calculateStock(copy.getId(), date).stock()).sum();
+
+    return new BookStockResponse(bookId, total);
+  }
+
   public BookCopy deleteBookCopy(UUID id) {
     JBookCopy jBookCopy =
         bookCopyRepository
