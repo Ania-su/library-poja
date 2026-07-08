@@ -4,10 +4,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import hei.school.demo.endpoint.rest.controller.dto.LowStockResponse;
 import hei.school.demo.entity.Book;
 import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.service.BookCopyService;
 import hei.school.demo.service.BookService;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,5 +65,26 @@ class BookControllerTest {
         .thenThrow(new NotFoundException("Book with id " + randomUUID + " not found"));
 
     mockMvc.perform(get("/books/" + randomUUID)).andExpect(status().isNotFound());
+  }
+
+  @Test
+  void getLowStock_ok_withDefaultThreshold() throws Exception {
+    when(bookCopyService.getLowStockCopies(3)).thenReturn(Collections.emptyList());
+
+    mockMvc
+        .perform(get("/books/low-stock"))
+        .andExpect(status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(0));
+  }
+
+  @Test
+  void getLowStock_ok_withCustomThreshold() throws Exception {
+    when(bookCopyService.getLowStockCopies(5))
+        .thenReturn(Collections.nCopies(2, (LowStockResponse) null));
+
+    mockMvc
+        .perform(get("/books/low-stock").param("threshold", "5"))
+        .andExpect(status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2));
   }
 }
