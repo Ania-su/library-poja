@@ -1,14 +1,23 @@
 package hei.school.demo.endpoint.rest.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import hei.school.demo.endpoint.rest.controller.dto.BookRequest;
 import hei.school.demo.endpoint.rest.controller.dto.LowStockResponse;
 import hei.school.demo.entity.Book;
 import hei.school.demo.exception.NotFoundException;
 import hei.school.demo.service.BookCopyService;
 import hei.school.demo.service.BookService;
+
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -18,16 +27,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @WebMvcTest(controllers = BookController.class)
-@AutoConfigureMockMvc(addFilters = false)
 class BookControllerTest {
   private Book book1;
   private Book book2;
 
   @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
 
   @MockBean private BookService bookService;
 
@@ -54,6 +64,18 @@ class BookControllerTest {
   }
 
   @Test
+  void getBooks_shouldReturn400_with_invalidDateFormat() throws Exception {
+    mockMvc.perform(get("/books").param("before", "not-a-date")).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void getBookById_ok_withExistingBook() throws Exception {
+    var id = UUID.randomUUID();
+    when(bookService.getBookById(id)).thenReturn(book1);
+    mockMvc.perform(get("/books/" + id)).andExpect(status().isOk());
+  }
+
+  @Test
   void getBookById_shouldReturn400_with_invalidUUID() throws Exception {
     mockMvc.perform(get("/books/1")).andExpect(status().isBadRequest());
   }
@@ -66,6 +88,100 @@ class BookControllerTest {
 
     mockMvc.perform(get("/books/" + randomUUID)).andExpect(status().isNotFound());
   }
+
+  @Test
+  void deleteBook_noContent_withExistingBook() throws Exception {
+    var id = UUID.randomUUID();
+    mockMvc.perform(delete("/books/" + id)).andExpect(status().isNoContent());
+    verify(bookService).deleteBook(id);
+  }
+
+  @Test
+  void deleteBook_shouldReturn404_with_nonExistingBook() throws Exception {
+    var randomUUID = UUID.randomUUID();
+    doThrow(new NotFoundException("Book with id " + randomUUID + " not found"))
+        .when(bookService)
+        .deleteBook(randomUUID);
+    mockMvc.perform(delete("/books/" + randomUUID)).andExpect(status().isNotFound());
+  }
+
+  @Test
+  void deleteBook_shouldReturn400_with_invalidUUID() throws Exception {
+    mockMvc.perform(delete("/books/1")).andExpect(status().isBadRequest());
+  }
+
+    @Test
+    void createBook_created_withValidBody() throws Exception {
+        BookRequest request = new BookRequest();
+        request.setTitle("Clean Code");
+        request.setDescription("A handbook of agile software craftsmanship");
+        request.setPublicationDate(LocalDate.of(2008, 8, 1));
+        request.setAuthors(List.of("author-1"));
+        request.setGenres(List.of("genre-1"));
+
+        when(bookService.createBook(any(BookRequest.class))).thenReturn(book1);
+
+        mockMvc
+                .perform(
+                        post("/books")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        verify(bookService).createBook(any(BookRequest.class));
+    }
+
+    @Test
+    void updateBook_ok_withExistingBook() throws Exception {
+        var id = UUID.randomUUID();
+        BookRequest request = new BookRequest();
+        request.setTitle("Clean Code");
+        request.setDescription("A handbook of agile software craftsmanship");
+        request.setPublicationDate(LocalDate.of(2008, 8, 1));
+        request.setAuthors(List.of("author-1"));
+        request.setGenres(List.of("genre-1"));
+
+        when(bookService.updateBook(eq(id), any(BookRequest.class))).thenReturn(book1);
+
+        mockMvc
+                .perform(
+                        put("/books/" + id)
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        verify(bookService).updateBook(eq(id), any(BookRequest.class));
+    }
+
+    @Test
+    void updateBook_shouldReturn404_with_nonExistingBook() throws Exception {
+        var randomUUID = UUID.randomUUID();
+        BookRequest request = new BookRequest();
+        request.setTitle("Clean Code");
+
+        when(bookService.updateBook(eq(randomUUID), any(BookRequest.class)))
+                .thenThrow(new NotFoundException("Book with id " + randomUUID + " not found"));
+
+        mockMvc
+                .perform(
+                        put("/books/" + randomUUID)
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateBook_shouldReturn400_with_invalidUUID() throws Exception {
+        BookRequest request = new BookRequest();
+        request.setTitle("Clean Code");
+
+        mockMvc
+                .perform(
+                        put("/books/1")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
 
   @Test
   void getLowStock_ok_withDefaultThreshold() throws Exception {
