@@ -60,4 +60,10 @@ public class BookCopyController {
     BookCopy bookCopy = copyService.deleteBookCopy(copyId);
     return ResponseEntity.ok(bookCopy);
   }
+
+  @GetMapping("/stock")
+  public ResponseEntity<BookStockResponse> getTotalStock(
+      @PathVariable UUID id, @RequestParam(required = false) LocalDate date) {
+    return ResponseEntity.ok(copyService.calculateTotalStock(id, date));
+  }
 }
