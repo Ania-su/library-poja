@@ -7,12 +7,10 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://api.library.com/v1
-    description: Production server
+  - url: https://po2rtutjbd22exdskpqjicjqlm0nspjt.lambda-url.eu-west-3.on.aws
+    description: PreProduction server
 
 tags:
-  - name: Health
-    description: Health check endpoints
   - name: Genres
     description: Genre statistics
   - name: Books
@@ -28,57 +26,6 @@ tags:
 
 
 paths:
-
-  # ── Health ─────────────────────────────────────
-  /ping:
-    get:
-      tags: [Health]
-      summary: Health check — always returns "pong"
-      operationId: ping
-      responses:
-        '200':
-          description: OK
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: pong
-
-  /health/db:
-    get:
-      tags: [Health]
-      summary: Check database connectivity
-      operationId: healthDb
-      responses:
-        '200':
-          description: "OK if DB is reachable and non-empty, KO otherwise"
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: OK
-
-  /health/email:
-    get:
-      tags: [Health]
-      summary: Send a test email
-      operationId: healthEmail
-      parameters:
-        - name: to
-          in: query
-          required: true
-          description: Recipient email address
-          schema:
-            type: string
-            format: email
-      responses:
-        '200':
-          description: Test emails sent
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: OK
 
   # ── Genre Profits ──────────────────────────────
   /genres/profits:
