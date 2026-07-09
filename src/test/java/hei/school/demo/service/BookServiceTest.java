@@ -185,4 +185,32 @@ public class BookServiceTest {
     assertTrue(ex.getMessage().contains("Book not found"));
     verify(bookRepository, never()).save(any());
   }
+
+  @Test
+  void testDeleteBook() {
+    UUID bookId = UUID.fromString("00000000-0000-0000-0000-000000000456");
+    var jBook = new JBook();
+    jBook.setId(bookId);
+    jBook.setTitle("book to delete");
+
+    when(bookRepository.findById(bookId)).thenReturn(Optional.of(jBook));
+
+    var result = bookService.deleteBook(bookId);
+
+    assertNotNull(result);
+    assertEquals(bookId, result.getId());
+    assertEquals("book to delete", result.getTitle());
+    verify(bookRepository).deleteById(bookId);
+  }
+
+  @Test
+  void testDeleteBook_notFound() {
+    var unknownId = UUID.fromString("00000000-0000-0000-0000-999999999997");
+    when(bookRepository.findById(unknownId)).thenReturn(Optional.empty());
+
+    var ex = assertThrows(RuntimeException.class, () -> bookService.deleteBook(unknownId));
+
+    assertTrue(ex.getMessage().contains("Book not found"));
+    verify(bookRepository, never()).deleteById(any());
+  }
 }
