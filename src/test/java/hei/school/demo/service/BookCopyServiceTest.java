@@ -281,4 +281,93 @@ class BookCopyServiceTest {
 
     assertThrows(RuntimeException.class, () -> bookCopyService.getCopyById(id));
   }
+
+  @Test
+  void calculateTotalStock_shouldReturnSumOfAllCopiesStock() {
+    UUID bookId = UUID.fromString("00000000-0000-0000-0000-111111111112");
+    UUID copyId1 = UUID.fromString("00000000-0000-0000-0000-111111111111");
+    UUID copyId2 = UUID.fromString("00000000-0000-0000-0000-111111111222");
+
+    var jCopy1 = new JBookCopy();
+    jCopy1.setId(copyId1);
+
+    var jCopy2 = new JBookCopy();
+    jCopy2.setId(copyId2);
+
+    when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(List.of(jCopy1, jCopy2));
+
+    when(bookCopyRepository.findById(copyId1)).thenReturn(Optional.of(jCopy1));
+    when(arrivalRepository.sumArrivalQuantityByBookCopyId(copyId1)).thenReturn(10);
+    when(saleRepository.sumSaleQuantityByBookCopyId(copyId1)).thenReturn(3);
+
+    when(bookCopyRepository.findById(copyId2)).thenReturn(Optional.of(jCopy2));
+    when(arrivalRepository.sumArrivalQuantityByBookCopyId(copyId2)).thenReturn(5);
+    when(saleRepository.sumSaleQuantityByBookCopyId(copyId2)).thenReturn(2);
+
+    BookStockResponse response = bookCopyService.calculateTotalStock(bookId, null);
+
+    assertEquals(bookId, response.bookCopyId());
+    assertEquals(10, response.stock());
+  }
+
+  @Test
+  void calculateTotalStock_withNoCopies_shouldReturnZero() {
+    UUID bookId = UUID.randomUUID();
+
+    when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(List.of());
+
+    BookStockResponse response = bookCopyService.calculateTotalStock(bookId, null);
+
+    assertEquals(bookId, response.bookCopyId());
+    assertEquals(0, response.stock());
+  }
+
+  @Test
+  void getLowStockCopies_shouldReturnGroupedByBook() {
+    var bookId = UUID.fromString("00000000-0000-0000-0000-111111111112");
+    var copyId = UUID.fromString("00000000-0000-0000-0000-111111111111");
+
+    Object[] row = new Object[] {bookId, "Le petit prince", copyId, BookFormat.POCKET, 5};
+    List<Object[]> rows = new ArrayList<>();
+    rows.add(row);
+
+    when(bookCopyRepository.findLowStockCopies(10)).thenReturn(rows);
+
+    var result = bookCopyService.getLowStockCopies(10);
+
+    assertEquals(1, result.size());
+    assertEquals(bookId, result.get(0).getId());
+    assertEquals("Le petit prince", result.get(0).getTitle());
+    assertEquals(1, result.get(0).getCopies().size());
+    verify(bookCopyRepository).findLowStockCopies(10);
+  }
+
+  @Test
+  void getLowStockCopies_shouldGroupMultipleCopiesUnderSameBook() {
+    var bookId = UUID.fromString("00000000-0000-0000-0000-111111111112");
+    var copyId1 = UUID.fromString("00000000-0000-0000-0000-111111111111");
+    var copyId2 = UUID.fromString("00000000-0000-0000-0000-111111111222");
+
+    List<Object[]> rows = new ArrayList<>();
+    rows.add(new Object[] {bookId, "Le petit prince", copyId1, BookFormat.POCKET, 3});
+    rows.add(new Object[] {bookId, "Le petit prince", copyId2, BookFormat.HARDBACK, 1});
+
+    when(bookCopyRepository.findLowStockCopies(5)).thenReturn(rows);
+
+    var result = bookCopyService.getLowStockCopies(5);
+
+    assertEquals(1, result.size());
+    assertEquals(2, result.get(0).getCopies().size());
+  }
+
+  @Test
+  void getLowStockCopies_shouldReturnEmpty_whenNoLowStockCopies() {
+    List<Object[]> rows = new ArrayList<>();
+    when(bookCopyRepository.findLowStockCopies(10)).thenReturn(rows);
+
+    var result = bookCopyService.getLowStockCopies(10);
+
+    assertTrue(result.isEmpty());
+    verify(bookCopyRepository).findLowStockCopies(10);
+  }
 }
