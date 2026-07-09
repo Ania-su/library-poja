@@ -281,4 +281,44 @@ class BookCopyServiceTest {
 
     assertThrows(RuntimeException.class, () -> bookCopyService.getCopyById(id));
   }
+
+  @Test
+  void calculateTotalStock_shouldReturnSumOfAllCopiesStock() {
+    UUID bookId = UUID.fromString("00000000-0000-0000-0000-111111111112");
+    UUID copyId1 = UUID.fromString("00000000-0000-0000-0000-111111111111");
+    UUID copyId2 = UUID.fromString("00000000-0000-0000-0000-111111111222");
+
+    var jCopy1 = new JBookCopy();
+    jCopy1.setId(copyId1);
+
+    var jCopy2 = new JBookCopy();
+    jCopy2.setId(copyId2);
+
+    when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(List.of(jCopy1, jCopy2));
+
+    when(bookCopyRepository.findById(copyId1)).thenReturn(Optional.of(jCopy1));
+    when(arrivalRepository.sumArrivalQuantityByBookCopyId(copyId1)).thenReturn(10);
+    when(saleRepository.sumSaleQuantityByBookCopyId(copyId1)).thenReturn(3);
+
+    when(bookCopyRepository.findById(copyId2)).thenReturn(Optional.of(jCopy2));
+    when(arrivalRepository.sumArrivalQuantityByBookCopyId(copyId2)).thenReturn(5);
+    when(saleRepository.sumSaleQuantityByBookCopyId(copyId2)).thenReturn(2);
+
+    BookStockResponse response = bookCopyService.calculateTotalStock(bookId, null);
+
+    assertEquals(bookId, response.bookCopyId());
+    assertEquals(10, response.stock());
+  }
+
+  @Test
+  void calculateTotalStock_withNoCopies_shouldReturnZero() {
+    UUID bookId = UUID.randomUUID();
+
+    when(bookCopyRepository.findAll(any(Specification.class))).thenReturn(List.of());
+
+    BookStockResponse response = bookCopyService.calculateTotalStock(bookId, null);
+
+    assertEquals(bookId, response.bookCopyId());
+    assertEquals(0, response.stock());
+  }
 }
