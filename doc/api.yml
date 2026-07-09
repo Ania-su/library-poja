@@ -11,14 +11,14 @@ servers:
     description: Production server
 
 tags:
-  - name: Authors
-    description: Author management
+  - name: Health
+    description: Health check endpoints
   - name: Genres
-    description: Genre management
+    description: Genre statistics
   - name: Books
     description: Book management with multi-criteria search
   - name: Book Copies
-    description: Physical book copy management
+    description: Physical book copy management (nested under books)
   - name: Arrivals
     description: Arrival management for new book copies
   - name: Customers
@@ -27,186 +27,76 @@ tags:
     description: Sale management for processing orders
 
 
-# ─────────────────────────────────────────────
-# PATHS
-# ─────────────────────────────────────────────
 paths:
 
-  # ── Authors ──────────────────────────────────
-  /authors:
+  # ── Health ─────────────────────────────────────
+  /ping:
     get:
-      tags: [Authors]
-      summary: List all authors
-      operationId: listAuthors
+      tags: [Health]
+      summary: Health check — always returns "pong"
+      operationId: ping
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+
+  /health/db:
+    get:
+      tags: [Health]
+      summary: Check database connectivity
+      operationId: healthDb
+      responses:
+        '200':
+          description: "OK if DB is reachable and non-empty, KO otherwise"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+
+  /health/email:
+    get:
+      tags: [Health]
+      summary: Send a test email
+      operationId: healthEmail
       parameters:
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/pageSize'
+        - name: to
+          in: query
+          required: true
+          description: Recipient email address
+          schema:
+            type: string
+            format: email
       responses:
         '200':
-          description: Paginated list of authors
+          description: Test emails sent
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: '#/components/schemas/AuthorPage'
+                type: string
+                example: OK
 
-    post:
-      tags: [Authors]
-      summary: Create a new author
-      operationId: createAuthor
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthorCreation'
-      responses:
-        '201':
-          description: Author successfully created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Author'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-
-  /authors/{id}:
-    parameters:
-      - $ref: '#/components/parameters/id'
-
-    get:
-      tags: [Authors]
-      summary: Get an author by ID
-      operationId: getAuthor
-      responses:
-        '200':
-          description: Author found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Author'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-    patch:
-      tags: [Authors]
-      summary: Partially update an author
-      operationId: updateAuthor
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthorUpdate'
-      responses:
-        '200':
-          description: Author successfully updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Author'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-    delete:
-      tags: [Authors]
-      summary: Delete an author
-      operationId: deleteAuthor
-      responses:
-        '204':
-          description: Author successfully deleted
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-  # ── Genres ───────────────────────────────────
-  /genres:
+  # ── Genre Profits ──────────────────────────────
+  /genres/profits:
     get:
       tags: [Genres]
-      summary: List all genres
-      operationId: listGenres
-      parameters:
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/pageSize'
+      summary: Get profit breakdown by genre
+      operationId: getGenreProfits
       responses:
         '200':
-          description: Paginated list of genres
+          description: Profit per genre
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GenrePage'
+                type: array
+                items:
+                  $ref: '#/components/schemas/GenreProfit'
 
-    post:
-      tags: [Genres]
-      summary: Create a new genre
-      operationId: createGenre
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenreCreation'
-      responses:
-        '201':
-          description: Genre successfully created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Genre'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-
-  /genres/{id}:
-    parameters:
-      - $ref: '#/components/parameters/id'
-
-    get:
-      tags: [Genres]
-      summary: Get a genre by ID
-      operationId: getGenre
-      responses:
-        '200':
-          description: Genre found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Genre'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-    patch:
-      tags: [Genres]
-      summary: Partially update a genre
-      operationId: updateGenre
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenreUpdate'
-      responses:
-        '200':
-          description: Genre successfully updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Genre'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-    delete:
-      tags: [Genres]
-      summary: Delete a genre
-      operationId: deleteGenre
-      responses:
-        '204':
-          description: Genre successfully deleted
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-  # ── Books ────────────────────────────────────
+  # ── Books ──────────────────────────────────────
   /books:
     get:
       tags: [Books]
@@ -214,69 +104,56 @@ paths:
       operationId: listBooks
       parameters:
         - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/pageSize'
-        # ── Search / filter criteria ──
+        - $ref: '#/components/parameters/perPage'
         - name: title
           in: query
           description: Filter by title (case-insensitive partial match)
           schema:
             type: string
-          example: "Harry"
-        - name: authorId
-          in: query
-          description: Filter books by one or more author IDs
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
-          explode: true
-          example: ["a3bb189e-8bf9-3888-9912-ace4e6543002", "b5cc290f-9cga-4999-a023-bdf5f7654113"]
-        - name: genreId
-          in: query
-          description: Filter books by one or more genre IDs
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
-          explode: true
-          example: ["f47ac10b-58cc-4372-a567-0e02b2c3d479"]
-        - name: format
-          in: query
-          description: Filter by book format
-          schema:
-            $ref: '#/components/schemas/BookFormat'
-        - name: publicationDateFrom
-          in: query
-          description: Lower bound on publication date (inclusive, ISO 8601 date)
-          schema:
-            type: string
-            format: date
-          example: "2000-01-01"
-        - name: publicationDateTo
-          in: query
-          description: Upper bound on publication date (inclusive, ISO 8601 date)
-          schema:
-            type: string
-            format: date
-          example: "2024-12-31"
         - name: description
           in: query
-          description: Filter by keywords in the description (case-insensitive partial match)
+          description: Filter by keywords in description
           schema:
             type: string
+        - name: authorId
+          in: query
+          description: Filter by one or more author IDs
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: form
+          explode: true
+        - name: genreId
+          in: query
+          description: Filter by one or more genre IDs
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: form
+          explode: true
+        - name: before
+          in: query
+          description: Upper bound on publication date (inclusive, ISO 8601)
+          schema:
+            type: string
+            format: date
+        - name: after
+          in: query
+          description: Lower bound on publication date (inclusive, ISO 8601)
+          schema:
+            type: string
+            format: date
       responses:
         '200':
           description: Paginated and filtered list of books
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookPage'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                $ref: '#/components/schemas/BooksResponse'
 
     post:
       tags: [Books]
@@ -287,7 +164,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BookCreation'
+              $ref: '#/components/schemas/BookRequest'
       responses:
         '201':
           description: Book successfully created
@@ -295,8 +172,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Book'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+
+  /books/low-stock:
+    get:
+      tags: [Books]
+      summary: Get books with low stock copies
+      operationId: getLowStock
+      parameters:
+        - name: threshold
+          in: query
+          description: Minimum stock threshold (default 3)
+          schema:
+            type: integer
+            default: 3
+      responses:
+        '200':
+          description: List of books with low-stock copies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LowStockResponse'
 
   /books/{id}:
     parameters:
@@ -316,16 +213,16 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-    patch:
+    put:
       tags: [Books]
-      summary: Partially update a book
+      summary: Update a book
       operationId: updateBook
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BookUpdate'
+              $ref: '#/components/schemas/BookRequest'
       responses:
         '200':
           description: Book successfully updated
@@ -348,48 +245,44 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  # ── Book Copies ──────────────────────────────
-  /book-copies:
+  # ── Book Copies ────────────────────────────────
+  /books/{id}/copy:
+    parameters:
+      - $ref: '#/components/parameters/id'
+
     get:
       tags: [Book Copies]
-      summary: List all book copies
+      summary: List all copies of a book
       operationId: listBookCopies
       parameters:
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/pageSize'
-        - name: bookId
-          in: query
-          description: Filter copies by book ID
-          schema:
-            type: string
-            format: uuid
-            example: "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
         - name: format
           in: query
-          description: Filter copies by format
+          description: Filter by format
           schema:
             $ref: '#/components/schemas/BookFormat'
         - name: minPrice
           in: query
-          description: Filter copies with price greater than or equal to this value
+          description: Minimum selling price
           schema:
             type: number
             format: float
             minimum: 0
         - name: maxPrice
           in: query
-          description: Filter copies with price less than or equal to this value
+          description: Maximum selling price
           schema:
             type: number
             format: float
             minimum: 0
       responses:
         '200':
-          description: Paginated list of book copies
+          description: List of copies for this book
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookCopyPage'
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookCopy'
 
     post:
       tags: [Book Copies]
@@ -411,9 +304,40 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
 
-  /book-copies/{id}:
+  /books/{id}/copy/stock:
     parameters:
       - $ref: '#/components/parameters/id'
+
+    get:
+      tags: [Book Copies]
+      summary: Get total stock for all copies of a book
+      operationId: getTotalStock
+      parameters:
+        - name: date
+          in: query
+          required: false
+          description: Calculate stock as of this date (inclusive)
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Total stock calculated as arrivals minus sales
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookStockResponse'
+
+  /books/{id}/copy/{copyId}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+      - name: copyId
+        in: path
+        required: true
+        description: Book copy ID (UUID)
+        schema:
+          type: string
+          format: uuid
 
     get:
       tags: [Book Copies]
@@ -456,29 +380,41 @@ paths:
       summary: Delete a book copy
       operationId: deleteBookCopy
       responses:
-        '204':
-          description: Book copy successfully deleted
+        '200':
+          description: Book copy deleted (returns deleted copy)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookCopy'
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /book-copies/{id}/stock:
+  /books/{id}/copy/{copyId}/stock:
+    parameters:
+      - $ref: '#/components/parameters/id'
+      - name: copyId
+        in: path
+        required: true
+        description: Book copy ID (UUID)
+        schema:
+          type: string
+          format: uuid
+
     get:
       tags: [Book Copies]
-      summary: Get stock for a book copy
+      summary: Get stock for a specific book copy
       operationId: getBookCopyStock
       parameters:
-        - $ref: '#/components/parameters/id'
         - name: t
           in: query
           required: false
-          description: Calculate stock as of this date (inclusive). Uses current stock if omitted.
+          description: Calculate stock as of this date (inclusive)
           schema:
             type: string
             format: date
-            example: "2024-06-21"
       responses:
         '200':
-          description: Stock calculated as arrivals minus sales
+          description: Stock for this copy
           content:
             application/json:
               schema:
@@ -486,7 +422,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  # ── Arrivals ────────────────────────────────────
+  # ── Arrivals ───────────────────────────────────
   /arrivals:
     get:
       tags: [Arrivals]
@@ -494,14 +430,14 @@ paths:
       operationId: listArrivals
       parameters:
         - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/perPage'
       responses:
         '200':
           description: Paginated list of arrivals
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrivalPage'
+                $ref: '#/components/schemas/ArrivalsResponse'
 
     post:
       tags: [Arrivals]
@@ -512,7 +448,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ArrivalItemCreation'
+              $ref: '#/components/schemas/ArrivalRequest'
       responses:
         '201':
           description: Arrival successfully recorded
@@ -550,7 +486,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ArrivalUpdate'
+              $ref: '#/components/schemas/ArrivalUpdateRequest'
       responses:
         '200':
           description: Arrival successfully updated
@@ -581,14 +517,14 @@ paths:
       operationId: listCustomers
       parameters:
         - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/perPage'
       responses:
         '200':
           description: Paginated list of customers
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerPage'
+                $ref: '#/components/schemas/CustomerListResponse'
 
     post:
       tags: [Customers]
@@ -599,7 +535,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomerCreation'
+              $ref: '#/components/schemas/CustomerRequest'
       responses:
         '201':
           description: Customer successfully created
@@ -637,7 +573,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomerUpdate'
+              $ref: '#/components/schemas/CustomerRequest'
       responses:
         '200':
           description: Customer successfully updated
@@ -660,7 +596,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  # ── Sales ─────────────────────────────────────
+  # ── Sales ──────────────────────────────────────
   /sales:
     get:
       tags: [Sales]
@@ -668,14 +604,14 @@ paths:
       operationId: listSales
       parameters:
         - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/perPage'
       responses:
         '200':
           description: Paginated list of sales
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SalePage'
+                $ref: '#/components/schemas/SalesResponse'
 
     post:
       tags: [Sales]
@@ -686,7 +622,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SaleCreation'
+              $ref: '#/components/schemas/SaleRequest'
       responses:
         '201':
           description: Sale successfully created
@@ -724,7 +660,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SaleUpdate'
+              $ref: '#/components/schemas/SaleRequest'
       responses:
         '200':
           description: Sale successfully updated
@@ -747,12 +683,9 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-# ─────────────────────────────────────────────
-# COMPONENTS
-# ─────────────────────────────────────────────
+
 components:
 
-  # ── Reusable parameters ───────────────────────
   parameters:
     id:
       name: id
@@ -762,7 +695,6 @@ components:
       schema:
         type: string
         format: uuid
-        example: "550e8400-e29b-41d4-a716-446655440000"
 
     page:
       name: page
@@ -773,592 +705,76 @@ components:
         minimum: 1
         default: 1
 
-    pageSize:
-      name: pageSize
+    perPage:
+      name: perPage
       in: query
       description: Number of items per page
       schema:
         type: integer
         minimum: 1
         maximum: 100
-        default: 20
+        default: 10
 
-  # ── Reusable responses ────────────────────────
   responses:
     NotFound:
       description: The requested resource was not found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            code: 404
-            message: "Resource not found"
+            $ref: '#/components/schemas/ApiError'
 
     BadRequest:
       description: The request body or parameters are invalid
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            code: 400
-            message: "Validation error: 'title' is required"
+            $ref: '#/components/schemas/ApiError'
 
-  # ── Schemas ───────────────────────────────────
   schemas:
 
-    # ── Shared ────────────────────────────────
-    Error:
+    # ── Shared ─────────────────────────────────
+    ApiError:
       type: object
-      required: [code, message]
+      required: [timestamp, status, error, message]
       properties:
-        code:
+        timestamp:
+          type: string
+          format: date-time
+          description: Error occurrence time
+        status:
           type: integer
           description: HTTP status code
+        error:
+          type: string
+          description: Error category
         message:
           type: string
           description: Human-readable error description
 
     PaginationMeta:
       type: object
-      required: [page, pageSize, totalItems, totalPages]
+      required: [total, page, perPage]
       properties:
+        total:
+          type: integer
+          description: Total number of items matching the query
+          example: 142
         page:
           type: integer
           description: Current page number
           example: 1
-        pageSize:
+        perPage:
           type: integer
           description: Number of items per page
-          example: 20
-        totalItems:
-          type: integer
-          description: Total number of items matching the query
-          example: 142
-        totalPages:
-          type: integer
-          description: Total number of pages
-          example: 8
+          example: 10
 
-    # NOTE: HARD_BDACK in the original source is a typo — corrected to HARD_BACK
     BookFormat:
       type: string
       description: Physical format of a book copy
       enum:
-        - HARD_BACK
-        - PAPER_BACK
         - POCKET
-
-    # ── Author ───────────────────────────────
-    Author:
-      type: object
-      required: [id, firstName, lastName, biography]
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: "a3bb189e-8bf9-3888-9912-ace4e6543002"
-        firstName:
-          type: string
-          example: "George"
-        lastName:
-          type: string
-          example: "Orwell"
-        biography:
-          type: string
-          example: "English novelist and essayist, journalist and critic."
-
-    AuthorCreation:
-      type: object
-      required: [firstName, lastName, biography]
-      properties:
-        firstName:
-          type: string
-          example: "George"
-        lastName:
-          type: string
-          example: "Orwell"
-        biography:
-          type: string
-          example: "English novelist and essayist, journalist and critic."
-
-    AuthorUpdate:
-      type: object
-      description: All fields are optional — only provided fields will be updated
-      properties:
-        firstName:
-          type: string
-        lastName:
-          type: string
-        biography:
-          type: string
-
-    AuthorPage:
-      type: object
-      required: [data, meta]
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Author'
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-
-    # ── Genre ────────────────────────────────
-    Genre:
-      type: object
-      required: [id, name, description]
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-        name:
-          type: string
-          example: "Dystopian Fiction"
-        description:
-          type: string
-          example: "Fiction set in an imagined society characterized by oppression."
-
-    GenreCreation:
-      type: object
-      required: [name, description]
-      properties:
-        name:
-          type: string
-          example: "Dystopian Fiction"
-        description:
-          type: string
-          example: "Fiction set in an imagined society characterized by oppression."
-
-    GenreUpdate:
-      type: object
-      description: All fields are optional — only provided fields will be updated
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-
-    GenrePage:
-      type: object
-      required: [data, meta]
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Genre'
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-
-    # ── Book ─────────────────────────────────
-    Book:
-      type: object
-      required: [id, title, publicationDate, description, author, genre, format]
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
-        title:
-          type: string
-          example: "Nineteen Eighty-Four"
-        publicationDate:
-          type: string
-          format: date
-          example: "1949-06-08"
-        description:
-          type: string
-          example: "A dystopian social science fiction novel set in Airstrip One."
-        bookAuthors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Author'
-        genres:
-          type: array
-          items:
-            $ref: '#/components/schemas/Genre'
-        copies:
-          type: array
-          items:
-            $ref: '#/components/schemas/BookCopy'
-
-    BookCreation:
-      type: object
-      required: [title, publicationDate, description, authorsId, genresId, format]
-      properties:
-        title:
-          type: string
-          example: "Nineteen Eighty-Four"
-        publicationDate:
-          type: string
-          format: date
-          example: "1949-06-08"
-        description:
-          type: string
-          example: "A dystopian social science fiction novel set in Airstrip One."
-        authorsId:
-          type: array
-          minItems: 1
-          items:
-            type: string
-            format: uuid
-          example: ["a3bb189e-8bf9-3888-9912-ace4e6543002"]
-        genresId:
-          type: array
-          minItems: 1
-          items:
-            type: string
-            format: uuid
-          example: ["f47ac10b-58cc-4372-a567-0e02b2c3d479"]
-        format:
-          $ref: '#/components/schemas/BookFormat'
-
-    BookUpdate:
-      type: object
-      description: All fields are optional — only provided fields will be updated
-      properties:
-        title:
-          type: string
-        publicationDate:
-          type: string
-          format: date
-        description:
-          type: string
-        authorsId:
-          type: array
-          minItems: 1
-          items:
-            type: string
-            format: uuid
-        genresId:
-          type: array
-          minItems: 1
-          items:
-            type: string
-            format: uuid
-        format:
-          $ref: '#/components/schemas/BookFormat'
-
-    BookPage:
-      type: object
-      required: [data, meta]
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Book'
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-
-    # ── BookCopy ─────────────────────────────
-    BookCopy:
-      type: object
-      required: [id, book, format, price, pages]
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: "550e8400-e29b-41d4-a716-446655440000"
-        book:
-          $ref: '#/components/schemas/Book'
-        format:
-          $ref: '#/components/schemas/BookFormat'
-        sellingPrice:
-          type: number
-          format: float
-          minimum: 0
-          example: 14.99
-
-    BookCopyCreation:
-      type: object
-      required: [bookId, format, price, pages]
-      properties:
-        bookId:
-          type: string
-          format: uuid
-          example: "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
-        format:
-          $ref: '#/components/schemas/BookFormat'
-        price:
-          type: number
-          format: float
-          minimum: 0
-          example: 14.99
-        pages:
-          type: integer
-          minimum: 1
-          description: Number of pages in this copy
-          example: 328
-
-    BookCopyUpdate:
-      type: object
-      description: All fields are optional — only provided fields will be updated
-      properties:
-        format:
-          $ref: '#/components/schemas/BookFormat'
-        price:
-          type: number
-          format: float
-          minimum: 0
-          example: 12.99
-        pages:
-          type: integer
-          minimum: 1
-          description: Number of pages in this copy
-          example: 328
-
-    BookCopyPage:
-      type: object
-      required: [data, meta]
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/BookCopy'
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-
-    # ── Book Stock ────────────────────────────
-    BookStockResponse:
-      type: object
-      required: [id, arrivalDate, items]
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: "d1a2b3c4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
-        arrivalDate:
-          type: string
-          format: date
-          example: "2024-06-21"
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ArrivalItem'
-
-    ArrivalItem:
-      type: object
-      required: [bookCopyId, quantity]
-      properties:
-        bookCopyId:
-          type: string
-          format: uuid
-          example: "550e8400-e29b-41d4-a716-446655440000"
-        quantity:
-          type: integer
-          minimum: 1
-          example: 5
-
-    Arrival:
-      type: object
-      required: [arrivalDate, items]
-      properties:
-        arrivalDate:
-          type: string
-          format: date
-          example: "2024-06-21"
-        items:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/ArrivalItemCreation'
-
-    ArrivalItemCreation:
-      type: object
-      required: [bookCopyId, quantity]
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: "550e8400-e29b-41d4-a716-446655440000"
-        quantity:
-          type: integer
-          minimum: 1
-          example: 5
-
-    ArrivalUpdate:
-      type: object
-      description: All fields are optional — only provided fields will be updated
-      properties:
-        arrivalDate:
-          type: string
-          format: date
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ArrivalItemCreation'
-
-    ArrivalPage:
-      type: object
-      required: [data, meta]
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Arrival'
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-
-    # ── Customer ─────────────────────────────
-    Customer:
-      type: object
-      required: [id, fullName, email]
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
-        fullName:
-          type: string
-          example: "John Doe"
-        email:
-          type: string
-          format: email
-          example: "john.doe@example.com"
-
-    CustomerCreation:
-      type: object
-      required: [fullName, email]
-      properties:
-        fullName:
-          type: string
-          example: "John Doe"
-        email:
-          type: string
-          format: email
-          example: "john.doe@example.com"
-
-    CustomerUpdate:
-      type: object
-      required: [fullName, email]
-      properties:
-        fullName:
-          type: string
-          example: "John Doe"
-        email:
-          type: string
-          format: email
-          example: "john.doe@example.com"
-
-    CustomerPage:
-      type: object
-      required: [data, meta]
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Customer'
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-
-    # ── Sale ─────────────────────────────────
-    Sale:
-      type: object
-      required: [id, customer, saleDate, status, paymentMethod, totalAmount, items]
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: "e1f2a3b4-c5d6-4a5b-8c9d-0e1f2a3b4c5d"
-        customer:
-          $ref: '#/components/schemas/Customer'
-        saleDate:
-          type: string
-          format: date
-          example: "2024-06-21"
-        status:
-          $ref: '#/components/schemas/SaleStatus'
-        paymentMethod:
-          $ref: '#/components/schemas/PaymentMethod'
-        totalAmount:
-          type: number
-          format: float
-          minimum: 0
-          example: 29.98
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/SaleItem'
-
-    SaleItem:
-      type: object
-      required: [id, bookCopyId, unitPrice, quantity]
-      properties:
-        id:
-          type: string
-          format: uuid
-        bookCopyId:
-          type: string
-          format: uuid
-          example: "550e8400-e29b-41d4-a716-446655440000"
-        unitPrice:
-          type: number
-          format: float
-          minimum: 0
-          example: 14.99
-        quantity:
-          type: integer
-          minimum: 1
-          example: 2
-
-    SaleItemRequest:
-      type: object
-      required: [bookCopyId, quantity]
-      properties:
-        bookCopyId:
-          type: string
-          format: uuid
-          example: "550e8400-e29b-41d4-a716-446655440000"
-        quantity:
-          type: integer
-          minimum: 1
-          example: 2
-
-    SaleCreation:
-      type: object
-      required: [customerId, saleDate, paymentMethod, items]
-      properties:
-        customerId:
-          type: string
-          format: uuid
-          example: "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
-        saleDate:
-          type: string
-          format: date
-          example: "2024-06-21"
-        paymentMethod:
-          $ref: '#/components/schemas/PaymentMethod'
-        status:
-          $ref: '#/components/schemas/SaleStatus'
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/SaleItemRequest'
-
-    SaleUpdate:
-      type: object
-      description: All fields are optional — only provided fields will be updated
-      properties:
-        saleDate:
-          type: string
-          format: date
-        status:
-          $ref: '#/components/schemas/SaleStatus'
-        paymentMethod:
-          $ref: '#/components/schemas/PaymentMethod'
-
-    SalePage:
-      type: object
-      required: [data, meta]
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Sale'
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
+        - PAPERBACK
+        - HARDBACK
 
     SaleStatus:
       type: string
@@ -1375,3 +791,418 @@ components:
         - CARD
         - CASH
         - MOBILE_MONEY
+
+    # ── Author ─────────────────────────────────
+    Author:
+      type: object
+      required: [id, firstName, lastName, biography]
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: a3bb189e-8bf9-3888-9912-ace4e6543002
+        firstName:
+          type: string
+          example: George
+        lastName:
+          type: string
+          example: Orwell
+        biography:
+          type: string
+          example: English novelist and essayist, journalist and critic.
+
+    # ── Genre ──────────────────────────────────
+    Genre:
+      type: object
+      required: [id, name, description]
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        name:
+          type: string
+          example: Dystopian Fiction
+        description:
+          type: string
+          example: Fiction set in an imagined society characterized by oppression.
+
+    GenreProfit:
+      type: object
+      required: [name, profit]
+      properties:
+        name:
+          type: string
+          example: Dystopian Fiction
+        profit:
+          type: number
+          format: double
+          example: 1249.50
+
+    # ── Book ───────────────────────────────────
+    Book:
+      type: object
+      required: [id, title, publicationDate, description]
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 6ba7b810-9dad-11d1-80b4-00c04fd430c8
+        title:
+          type: string
+          example: Nineteen Eighty-Four
+        publicationDate:
+          type: string
+          format: date
+          example: 1949-06-08
+        description:
+          type: string
+          example: A dystopian social science fiction novel set in Airstrip One.
+        copies:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookCopy'
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
+
+    BookRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Nineteen Eighty-Four
+        description:
+          type: string
+          example: A dystopian social science fiction novel set in Airstrip One.
+        publicationDate:
+          type: string
+          format: date
+          example: 1949-06-08
+        authors:
+          type: array
+          items:
+            type: string
+          example:
+            - a3bb189e-8bf9-3888-9912-ace4e6543002
+        genres:
+          type: array
+          items:
+            type: string
+          example:
+            - f47ac10b-58cc-4372-a567-0e02b2c3d479
+
+    BooksResponse:
+      type: object
+      required: [books, meta]
+      properties:
+        books:
+          type: array
+          items:
+            $ref: '#/components/schemas/Book'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    LowStockResponse:
+      type: object
+      required: [id, title, copies]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        copies:
+          type: array
+          items:
+            $ref: '#/components/schemas/LowStockCopy'
+
+    LowStockCopy:
+      type: object
+      required: [id, format, stock]
+      properties:
+        id:
+          type: string
+          format: uuid
+        format:
+          $ref: '#/components/schemas/BookFormat'
+        stock:
+          type: integer
+
+    # ── BookCopy ───────────────────────────────
+    BookCopy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        book:
+          $ref: '#/components/schemas/Book'
+        format:
+          $ref: '#/components/schemas/BookFormat'
+        sellingPrice:
+          type: number
+          format: double
+          minimum: 0
+          example: 14.99
+
+    BookCopyCreation:
+      type: object
+      properties:
+        bookId:
+          type: string
+          format: uuid
+          example: 6ba7b810-9dad-11d1-80b4-00c04fd430c8
+        format:
+          type: string
+          description: Book format (POCKET, PAPERBACK, HARDBACK)
+          example: PAPERBACK
+        sellingPrice:
+          type: number
+          format: double
+          minimum: 0
+          example: 14.99
+
+    BookCopyUpdate:
+      type: object
+      description: All fields are optional
+      properties:
+        format:
+          $ref: '#/components/schemas/BookFormat'
+        sellingPrice:
+          type: number
+          format: double
+          minimum: 0
+          example: 12.99
+
+    BookStockResponse:
+      type: object
+      required: [bookCopyId, stock]
+      properties:
+        bookCopyId:
+          type: string
+          format: uuid
+        stock:
+          type: integer
+          example: 42
+
+    # ── Arrival ────────────────────────────────
+    ArrivalItemRequest:
+      type: object
+      required: [bookCopyId, quantity]
+      properties:
+        bookCopyId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        quantity:
+          type: integer
+          minimum: 1
+          example: 5
+
+    ArrivalRequest:
+      type: object
+      properties:
+        arrivalDate:
+          type: string
+          format: date
+          example: 2024-06-21
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArrivalItemRequest'
+
+    ArrivalUpdateRequest:
+      type: object
+      properties:
+        arrivalDate:
+          type: string
+          format: date
+          example: 2024-06-21
+
+    ArrivalItem:
+      type: object
+      required: [id, arrivalId, bookCopyId, quantity]
+      properties:
+        id:
+          type: string
+          format: uuid
+        arrivalId:
+          type: string
+          format: uuid
+        bookCopyId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        quantity:
+          type: integer
+          minimum: 1
+          example: 5
+
+    Arrival:
+      type: object
+      required: [id, arrivalDate, items]
+      properties:
+        id:
+          type: string
+          format: uuid
+        arrivalDate:
+          type: string
+          format: date
+          example: 2024-06-21
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArrivalItem'
+
+    ArrivalsResponse:
+      type: object
+      required: [arrivals, meta]
+      properties:
+        arrivals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Arrival'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    # ── Customer ───────────────────────────────
+    Customer:
+      type: object
+      required: [id, fullName, email]
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d
+        fullName:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+
+    CustomerRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+
+    CustomerListResponse:
+      type: object
+      required: [customers, meta]
+      properties:
+        customers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    # ── Sale ───────────────────────────────────
+    SaleItemRequest:
+      type: object
+      required: [bookCopyId, quantity]
+      properties:
+        bookCopyId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        quantity:
+          type: integer
+          minimum: 1
+          example: 2
+
+    SaleRequest:
+      type: object
+      properties:
+        customerId:
+          type: string
+          format: uuid
+          example: a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d
+        saleDate:
+          type: string
+          format: date
+          example: 2024-06-21
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        status:
+          $ref: '#/components/schemas/SaleStatus'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SaleItemRequest'
+
+    SaleItem:
+      type: object
+      required: [id, saleId, bookCopyId, unitPrice, quantity]
+      properties:
+        id:
+          type: string
+          format: uuid
+        saleId:
+          type: string
+          format: uuid
+        bookCopyId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        unitPrice:
+          type: number
+          format: double
+          minimum: 0
+          example: 14.99
+        quantity:
+          type: integer
+          minimum: 1
+          example: 2
+
+    Sale:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: e1f2a3b4-c5d6-4a5b-8c9d-0e1f2a3b4c5d
+        customer:
+          $ref: '#/components/schemas/Customer'
+        saleDate:
+          type: string
+          format: date
+          example: 2024-06-21
+        status:
+          $ref: '#/components/schemas/SaleStatus'
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        totalAmount:
+          type: number
+          format: double
+          minimum: 0
+          example: 29.98
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SaleItem'
+
+    SalesResponse:
+      type: object
+      required: [sales, meta]
+      properties:
+        sales:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sale'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
